@@ -1,0 +1,75 @@
+
+ %%################ settings ###################
+\thispagestyle{empty}
+\definecolor{darkBlue}{rgb}{0, 0.255, 0.471} 
+\newcommand{\HRule}{\textcolor{darkBlue}{\rule{\textwidth}{0.4mm}}} 
+
+% thesis type
+\ifthenelse{\equal{\isenglish}{true}}{
+	\ifthenelse{\equal{\thesistype}{m}}{
+		\def\thesisname{Master's thesis}}
+	{\ifthenelse{\equal{\thesistype}{b}}{
+		\def\thesisname{Bachelor thesis}}
+	{\ifthenelse{\equal{\thesistype}{p}}{
+		\def\thesisname{Project work}}{
+		\def\thesisname{\thesistype}
+	}}}
+}
+{
+	\ifthenelse{\equal{\thesistype}{m}}{
+		\def\thesisname{Masterarbeit}}
+	{\ifthenelse{\equal{\thesistype}{b}}{
+		\def\thesisname{Bachelorarbeit}}
+	{\ifthenelse{\equal{\thesistype}{p}}{
+		\def\thesisname{Projektarbeit}}{
+		\def\thesisname{\thesistype}
+	}}}
+}
+
+ %%################ logo section ###################
+\HRule \\[0.4cm]
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\ifthenelse{\equal{\isenglish}{true}}
+{\includegraphics[height=2.5cm]{admin/Logo_TUHH_en}}
+{\includegraphics[height=2.5cm]{admin/Logo_TUHH_de}}
+\end{flushleft}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\includegraphics[height=2.5cm]{admin/Logo_ICS_4c} % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[0.4cm]
+\HRule \\
+
+
+ %%################ Data section ###################
+\begin{center}{\huge 
+	\ifthenelse{\equal{\isenglish}{true}}
+	{Colloquium}
+	{Regelungstechnisches Kolloquium}
+	}\\[1cm]
+	{\large\textit{\ifthenelse{\equal{\isenglish}{true}}{\ifthenelse{\equal{\gender}{m}}{Mr.}{Mrs.}}{\ifthenelse{\equal{\gender}{m}}{Herr}{Frau}} \authorfirstname \;\authorfamilyname}}\\[0.25cm]
+	(\whereFrom)\\[0.25cm]
+	\ifthenelse{\equal{\isenglish}{true}}{talks about the topic}{spricht über das Thema} \\
+	\ifthenelse{\equal{\whereFrom}{TUHH}}{\ifthenelse{\equal{\isenglish}{true}}{of the \MakeLowercase{\thesisname}}{der \thesisname} }{$ $}\\[1cm]
+	\begingroup
+	\renewcommand*\baselinestretch{1.5}%
+	\makeatletter\@currsize\makeatother%
+	\ifthenelse{\equal{\isenglish}{true}}{{\Large {\titlenameEN}}}{{\Large {\titlenameDE}}} \\[1cm]
+	\endgroup
+\end{center}
+
+{\small\selectfont
+\ifthenelse{\equal{\isenglish}{true}}{\input{\curdir contents/abstract_en}}{\input{\curdir contents/abstract}}\par}
+
+\begin{center}
+	\ifthenelse{\equal{\isenglish}{true}}{}{am }\presentationDate, \presentationTime \\
+	\ifthenelse{\equal{\isenglish}{true}}{in room }{in Raum }\presentationRoom \\[1cm]
+
+	\ifthenelse{\equal{\isenglish}{true}}{Invitations are extended by}{Zu dem hochschulöffentlichen Vortrag lädt herzlich ein:}\\[0.25cm]
+	\textit{Prof. Dr. Herbert Werner}\\[0.25cm]
+	\ifthenelse{\equal{\isenglish}{true}}{Institute of Control Systems}{Institut für Regelungstechnik}\\
+	\ifthenelse{\equal{\isenglish}{true}}{Hamburg University of Technology}{Technische Universität Hamburg}
+\end{center}

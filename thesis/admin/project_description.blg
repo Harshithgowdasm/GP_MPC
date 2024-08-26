@@ -1,0 +1,17 @@
+[0] Config.pm:307> INFO - This is Biber 2.17
+[0] Config.pm:310> INFO - Logfile is 'project_description.blg'
+[78] biber:340> INFO - === Mi Aug 16, 2023, 17:43:09
+[88] Biber.pm:418> INFO - Reading 'project_description.bcf'
+[138] Biber.pm:972> INFO - Found 0 citekeys in bib section 0
+[139] Biber.pm:972> INFO - Found 2 citekeys in bib section 1
+[139] Biber.pm:972> INFO - Found 0 citekeys in bib section 0
+[152] Biber.pm:4383> INFO - Processing section 1
+[161] Biber.pm:4574> INFO - Looking for bibtex file '../ics.bib' for section 1
+[161] bibtex.pm:1713> INFO - LaTeX decoding ...
+[170] bibtex.pm:1518> INFO - Found BibTeX data source '../ics.bib'
+[202] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[203] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[203] Biber.pm:4203> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'en-US'
+[203] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
+[204] bbl.pm:654> INFO - Writing 'project_description.bbl' with encoding 'UTF-8'
+[205] bbl.pm:757> INFO - Output to project_description.bbl

@@ -1,0 +1,20 @@
+
+%% This is the place for a very short abstract about your work. 
+%It should offer the reader an overview about the scope of the work and the attained results. 
+%This piece of text is also used as an announcement for your final presentation.
+%So take care about its length and comprehensibility.
+
+%For the following text, such an abstract could look like this:
+
+%This work gives a short introduction to the typesetting tool \LaTeX\ and points out its 
+%advantages for writing a scientific thesis. In the following, more general hints on how 
+%to write a bachelor thesis, master's thesis or project work, concerning structure, contents 
+%and representation, are given, with a special focus on how to do that in the Institute of Control Systems.
+
+Model Predictive Control (MPC) has emerged as a potent control technique in recent years, relying on solving open-loop optimal control problems iteratively. However, the necessity of accurate prediction models poses challenges, particularly when dealing with systems where such models are unavailable or difficult to identify. Data-driven control approaches offer an alternative, leveraging measured data to control unknown systems without prior model identification. Despite their promise, the treatment of measurement noise remains a significant challenge.
+
+In this thesis, we propose an approach to address this challenge by implementing a probabilistic MPC scheme utilizing Gaussian process models to represent the transition function of a nonlinear time-discrete system with noisy measurements and uncertainties. We employ a multioutput Gaussian process model comprising independent subprocesses to capture the stochastic nature of the system dynamics. The GP-MPC model presented has the ability to effectively control various systems with minimal interactions, thereby enhancing data efficiency even within an uncertainty framework.
+
+The thesis begins with a comprehensive literature review on Gaussian processes and probabilistic MPC, providing the necessary background for the proposed methodology. Subsequently, the methodology is put into practice and thoroughly evaluated through simulations encompassing various scenarios, including linear(DC motor) and nonlinear model(Van der Pol oscillator), uncertainties, and noisy measurements. Reference tracking for two distinct set points is implemented for the Van der Pol oscillator. All the GP-MPC results are compared to direct MPC results, where MPC is directly applied to the dynamics of the system. The obtained results are analyzed and discussed, shedding light on the effectiveness and applicability of the proposed probabilistic MPC approach. 
+
+The Git repository of our project work's code can be accessed via  \href{https://collaborating.tuhh.de/ICS/ics-private/students/student-repos/PA_Harshith_Gowda}{\textbf{this link}}.

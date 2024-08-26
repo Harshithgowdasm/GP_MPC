@@ -1,0 +1,237 @@
+%%%%%%%%%%%%%%%% Document settings %%%%%%%%%%%%%%%%%%%%
+%\NeedsTeXFormat{LaTeX2e}
+\documentclass[a4paper,12pt]{article}
+\usepackage{ifluatex}\usepackage{microtype}
+\ifluatex
+	\usepackage{fontspec}
+\else
+	\usepackage[utf8]{inputenc}
+\fi
+
+\usepackage{graphicx}                %% special graphics
+\usepackage{color}                   %% allow colour
+\usepackage{xcolor}
+\usepackage{latexsym}                %% symbols package
+\usepackage{amsmath}                 %% special mathematical functions
+\usepackage{theorem}
+\usepackage{amsfonts}
+\usepackage{ifthen}
+\usepackage[style=ieee,backend=biber]{biblatex} %% bibliography
+\usepackage{csquotes}
+\usepackage{multirow}                %% multirow tables
+\usepackage{booktabs}                %% make tables look nice
+\usepackage{enumerate}
+\usepackage{lmodern}
+\usepackage{subcaption}
+\usepackage{tikz}
+
+\ifthenelse{\equal{\isDraft}{true}}
+{
+  \usepackage[firstpageonly, color=red, text=DRAFT\\Version, scale=0.25, vanchor=t, angle=30, pos={14cm,5cm}]{draftwatermark}
+}
+{}
+
+\usetikzlibrary{%
+  arrows,%
+  arrows.meta,
+  shapes.misc,% wg. rounded rectangle
+  shapes.arrows,
+  shapes.misc,
+  calc,
+  plotmarks,
+  chains,%
+  matrix,%
+  positioning,% wg. " of "
+  scopes,%
+  decorations.pathmorphing,% /pgf/decoration/random steps | erste Graphik
+  decorations.markings,
+  shadows%
+}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=figures/externalize/] % activate!
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\newlength{\figw}
+\setlength{\figw}{0.8\textwidth}
+\newlength{\figh}
+\setlength{\figh}{0.4\textwidth}
+
+\newcommand{\tikzfig}[2]{
+  \tikzsetnextfilename{#2}%
+  \scalebox{#1}{
+    \input{"figures/#2.tex"}}
+}
+
+% Listings
+\usepackage{listings} \lstset{numbers=left, numberstyle=\tiny, numbersep=5pt, frame=single} 
+%\lstset{basicstyle=\ttfamily}
+\lstset{language=matlab,emph={lsim, ones, feedback},emphstyle=\textbf, identifierstyle=\ttfamily}
+
+%%############### Choose LANGUAGE
+\ifthenelse{\equal{\isenglish}{true}}{
+ %%% English
+	\usepackage[german, ngerman, english]{babel}
+	\selectlanguage{english}
+    \def\bibnamep{References}%
+    \def\bibnamem{References}%
+}{
+%%% German
+	\usepackage[english, german, ngerman]{babel}
+	\selectlanguage{german}
+    \def\bibnamep{Literatur}%
+    \def\bibnamem{Literaturverzeichnis}%
+}
+
+ %%############### Functions and Hyphenation rules
+\newcommand{\bbma} {\begin{bmatrix} }
+\newcommand{\ebma} {\end{bmatrix}}
+\newcommand{\real} {\mathbb{R}}
+\newcommand{\vs}[1]{\vspace{#1mm}}
+
+
+\hyphenation{Trenn-ungs-re-geln meh-re-re}
+
+
+ %%############### Enumeration of figures and equations
+\numberwithin{figure}{section}
+\numberwithin{equation}{section}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+
+
+ %%############### Figures
+\graphicspath{{\curdir figures/}} 				% Folder with the figures
+
+\ifpdf % pdfTeX
+	\DeclareGraphicsExtensions{.pdf,.png,.jpg,.gif,.pdftex}
+	\DeclareGraphicsRule{.pdftex}{pdf}{*}{}	% for xfig exported files
+	\newcommand{\xfig}[2]{\scalebox{#1}{\input{"\curdir figures/#2.pdftex_t"}}} % XFIG
+
+\else % DVI
+	\DeclareGraphicsExtensions{.eps,.pstex}
+	\DeclareGraphicsRule{.pstex}{eps}{*}{}		% for xfig exported files
+	\newcommand{\xfig}[2]{\scalebox{#1}{\input{"\curdir figures/#2.pstex_t"}}} % XFIG
+	%\usepackage{psfrag}		% might be useful
+\fi
+
+ % Other figures (e.g., MATLAB  EPS or PDF figures)
+\newcommand{\afig}[2]{\includegraphics[scale=#1]{\curdir#2}}
+
+ % figures defined in TeX files
+\newcommand{\tfig}[2]{\scalebox{#1}{\input{"\curdir #2.tex"}}}
+
+
+ %%############### Hyper References Settings
+%\ifpdf % pdfTeX
+%\else
+\usepackage[
+%a4paper=true;
+%letterpaper=false;
+hypertexnames = false,             % hyperlinks
+bookmarks=true,
+bookmarksnumbered=true,%
+linkbordercolor={0 1 1},%        % cyan
+urlbordercolor={0 0 1},%         % magenta
+plainpages=false,                % false - to fix the hyperpage links for index
+pdfsubject={Control Systems}]%
+{hyperref}
+%\fi
+
+
+
+
+
+ %%############### Page Size Settings
+%%% WAIT - before changing the settings make a back-up copy!!!
+%%% For more information about the meaning of the settings check
+%%% "The not so short introduction to LaTeX", page 125
+
+\setlength{\hoffset}{-1in}%               % To eliminate the standard offset
+\setlength{\voffset}{-1in}%
+\setlength{\evensidemargin}{23mm}%
+\setlength{\oddsidemargin}{35mm}%
+\setlength{\topmargin}{10mm}%
+\setlength{\headheight}{30pt}%
+
+\setlength{\headsep}{10mm}%
+\setlength{\textheight}{230mm}%
+\setlength{\textwidth}{160mm}%
+\setlength{\marginparsep}{0mm}%
+\setlength{\marginparwidth}{10mm}%
+\setlength{\footskip}{10mm}%
+
+\renewcommand{\textfraction}{0}%
+\renewcommand{\topfraction}{0.9}%
+\renewcommand{\bottomfraction}{0.9}%
+\renewcommand{\floatpagefraction}{1.5}
+
+\widowpenalty=10000      % penalty for creating widow line at top of page
+
+
+
+
+ %%############### Paragraph settings
+
+\setlength{\parindent}{0pt}%      % Paragraphs are not indent
+\setlength{\parskip}{5pt}%        % space between paragraphs
+
+\setlength{\labelwidth}{0.5cm}%
+\setlength{\labelsep}{0.5cm}%
+
+\renewcommand{\baselinestretch}{1.0}
+
+ %%############### New enviroments
+
+% generate new itemize environment, which consumes less space    
+\newenvironment{packeditemize}{
+  \begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+}{\end{itemize}}
+
+\newenvironment{packedenumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+}{\end{enumerate}}
+
+ %%############### % Numbered items
+%\setcounter{secnumdepth}{2}            % Number until 3th depth X.Y.Z
+%
+%\numberwithin{figure}  {section}       % Numbering of for the figures
+%\numberwithin{equation}{section}
+%
+%\newtheorem{definition} {Definition}[section]
+%\newtheorem{theorem}    {Theorem}   [section]
+
+%%############### Bibliography
+
+ %%###############  Page Style settings
+%\usepackage{fancyhdr}                %% extended page layout formating
+
+%\pagestyle{fancy}
+%
+%\renewcommand{\chaptermark}[1]{\markboth{\thechapter. \MakeUppercase{#1}}{}}
+%\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
+%\fancyhf{}%
+%\renewcommand{\headrulewidth}{0.4pt}
+%\renewcommand{\footrulewidth}{0.0pt}
+%
+% %% Single sinded
+%    \fancyhead[R]{\thepage}%%
+%    \fancyhead[L]{\rightmark}%%
+% \fancypagestyle{plain}{%
+%    \fancyhf{} % get rid of headers
+%    \renewcommand{\headrulewidth}{0pt}% get rid of the lines
+%    \renewcommand{\footrulewidth}{0pt}% get rid of the lines
+%}%
+%\makeatletter
+%\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page%
+%\else \thispagestyle{empty} \hbox{} \newpage%    
+%\fi\fi}%
+%\makeatother
+
+

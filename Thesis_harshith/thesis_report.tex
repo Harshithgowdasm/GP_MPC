@@ -1,0 +1,84 @@
+
+%   Template - Institute of Control Systems, TUHH
+
+%#############################################################################
+%     R E A D      M E     F I R S T  !
+%#############################################################################
+% For setting up a latex enviroment, please follow: https://www.latexbuch.de/latex-windows-installieren/
+% In Texmaker you can setup fast compile with these arguments: lualatex -interaction=nonstopmode %.tex|biber %|lualatex -interaction=nonstopmode %.tex|"C:/Program Files/Adobe/Reader 11.0/Reader/AcroRd32.exe" %.pdf
+% Possible compilation processes:
+% Luatex -> biber -> Luatex 
+% For texstudio: lualatex.exe -synctex=1 -interaction=nonstopmode --enable-write18 -interaction=nonstopmode %.tex or pdflatex.exe -synctex=1 -interaction=nonstopmode -shell-escape --enable-write18 -interaction=nonstopmode %.tex
+% enables the compiler to use tikz externalize as well
+% Toolchain is than: PDFLatex: txs:///pdflatex | txs:///biber | txs:///pdflatex | txs:///view-pdf-internal --embedded
+%					  LuaLatex: txs:///lualatex | txs:///biber | txs:///lualatex | txs:///view-pdf-internal --embedded
+% VS-Code + LatexWorkshop: Config-File in header/VS_Settings.json
+%#############################################################################
+
+%%################ Language settings #########################################
+
+\def\isenglish{true}	% change to false for German language
+
+%%################ DRAFT settings ############################################
+\def\isDraft{false}		% Change to false for final project description
+
+ %%################ Document settings #########################################
+\def\curdir{}
+\include{header/header}
+\addbibresource{ics.bib}
+
+\input{admin/thesis_data}
+\input{admin/thesis_tasks}
+
+ %%##############################  CONTENTS ###################################
+\begin{document}
+
+ %% Title page
+\input{header/titlepage}
+
+ %% Project description
+\input{header/include_pd}
+
+ %% Declaration
+\input{header/include_dc}
+\cleardoublepage
+
+ %% Abstract
+\input{header/include_ab}
+
+ %% Table of contents
+\input{header/include_toc}
+
+ %% Sections --------------------------------------------
+\begin{refsection}
+	%%\ifthenelse{\equal{\isenglish}{true}}%
+	%%{\include{contents/kapitel_0_en}}		% Introduction
+	%%{\include{contents/kapitel_0}} 	        % Einleitung
+	%
+	\ifthenelse{\equal{\isenglish}{true}}%
+	{\include{contents/kapitel_1_en}}		%
+	{\include{contents/kapitel_1}} 	        %
+	
+	\ifthenelse{\equal{\isenglish}{true}}%
+	{\include{contents/kapitel_2_en}}		%
+	{\include{contents/kapitel_2}} 	        %
+	%
+	\ifthenelse{\equal{\isenglish}{true}}%
+	{\include{contents/kapitel_3_en}}		%
+	{\include{contents/kapitel_3}} 	        %
+	%
+ 	\ifthenelse{\equal{\isenglish}{true}}%
+	{\include{contents/kapitel_4_en}}	%
+        {\include{contents/kapitel_4}} 	        %
+	%
+	\ifthenelse{\equal{\isenglish}{true}}%
+	{\include{contents/theend}}		        % Conclusion
+	{\include{contents/schluss}} 	        % Zusammenfassung
+	
+	\printbibliography[title=\bibnamem]
+\end{refsection} 
+
+ %% Appendix ---------------------------------------------
+\appendix
+
+\end{document}

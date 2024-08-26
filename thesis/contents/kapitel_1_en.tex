@@ -1,0 +1,151 @@
+\section{Writing with \LaTeX}\label{a:latex_en}
+
+\subsection{\LaTeX's Features}
+
+This section gives some useful hints to write a thesis with \LaTeX. It is important to know that \LaTeX\ is not a WYSIWYG (what you see is what you get) program like other text editors, such as Microsoft Word.
+Instead it much more resembles a programming language, in which you construct your text by proper usage of syntax. The ''source code'' is your \LaTeX file (\texttt{.tex}). 
+
+As in other programming languages it is possible to insert comments in \LaTeX\ that are not visible in the final text. 
+Line wraps are not of importance while writing the text, since they are created during compilation. Therefore, formatting 
+with \LaTeX is not a big deal and should not take a lot of time, if all the logical relations are correct.
+
+One of the big advantages of \LaTeX\ is writing formulas. Using the logical referencing of your formulas, those references are 
+always correct, even if you change the position of the formulas. Furthermore the print quality you achieve with \LaTeX\ formulas 
+is hardly matched by any other program, let alone free of charge!
+Citing is very easy in \LaTeX, as well.
+
+
+The following text is not very meaningful on its own, but if you read the source code at the same time, it is easy to understand how 
+different elements are constructed. You should try to compile the file yourself and compare the results. If there are any differences,
+check if your \LaTeX-configurations are correct.
+
+
+\subsection{Continuous Text}
+
+Writing continuous text is very easy. You can use an arbitrary text editor and just start writing, without paying any attention to 
+formatting, line breaks, etc. If you want to start a new paragraph, just leave one or more blank lines...
+
+So here we are now in a new paragraph. The font size is defined in the header of your main file. Emphasis is possible by different font styles. 
+Thus when you define a new term, this is normally accentuated in \textit{italic}, important statements in \textbf{bold} and programming code in
+\texttt{typewriter} or \verb"verbatim" style.
+
+\subsubsection{Structuring Your Work}
+
+On the lowest level you can use the command \texttt{subsubsection} to structure your work.
+
+\subsubsection*{Same Level, but Without Numbering}
+
+Have a look at the source code to see how that is achieved!
+
+\subsection{Special Objects}
+
+
+\subsubsection{Figures}\label{b:picturesubsection}
+
+Figure~\ref{f:picfirstfigure} shows a block diagram.
+
+\begin{figure}[ht]		% h - here, t - top, b - bottom, p - page, ! - try hard
+  \centering
+  \afig{1}{figures/example}			% {scaling}{Figure from MATLAB, picture, etc.}
+  \caption{First figure}
+  \label{f:picfirstfigure}
+\end{figure}
+
+If you compile your file using \texttt{dvi} 
+(\texttt{latex} $\rightarrow$ \texttt{dvi} $\rightarrow$ \texttt{pdf}, oder \texttt{latex} $\rightarrow$ \texttt{dvi} $\rightarrow$ \texttt{ps} $\rightarrow$ \texttt{pdf}) 
+your Figure~\ref{f:picfirstfigure} can be either a PS or an EPS file. If you are compiling with \texttt{pdfTeX}
+(\texttt{latex} $\rightarrow$ \texttt{pdf}), the figures need to be stored as JPEG, PDF, PNG, etc.\ files---not in PS or EPS format.
+
+Figure~\ref{f:xfigfigure} is an example for a diagram, created with XFig, a free and open source vector graphics editor.
+Other notable vector graphics editors are
+\begin{itemize}
+	\item Inkscape,
+	\item \LaTeX Draw,
+	\item ...
+\end{itemize}
+
+\begin{figure}[ht]
+  \centering
+  %\xfig{1}{carts.fig}			% {scaling}{XFig figure}
+  \caption{The second figure}
+  \label{f:xfigfigure}
+\end{figure}
+
+\subsubsection{Formulas}
+
+Formulas like
+\begin{eqnarray}
+\ddot{\phi}_1
+    &=&
+    \frac{M_1+l_1 \sin \phi_2
+    (m_2 l_{s2} + m_3 l_{s3})
+    (\dot{\phi}_2^2+2 \dot{\phi}_1\dot{\phi}_2 )
+    -f_1 \dot{\phi}_1}
+    {\theta_1+\theta_2+\theta_3+2l_1 (m_1 l_{s2}+m_3 l_{s3} \cos \phi_2)+
+    m_3 (l_1^2+l_2^2)+m_l l_1^2}  \,,  \label{e:eqnfirst} \\
+\ddot{\phi}_2
+    &=&
+    \frac{M_2 + l_1 \sin \phi_2 (m_2 l_{s2} + m_3 l_{s3})
+    \dot{\phi}_1^2 +2 - \phi_2 \dot{\phi}_2}
+    {\theta_1+\theta_2+\theta_3} \, \label{e:eqnsecond}
+\end{eqnarray}
+are typeset nicely. Keep in mind that formulas are and should be written as part of sentences and thus can and have to contain punctuation marks!
+
+
+\subsubsection{Symbols}
+
+Symbols like $\Omega$ can be included inline with the text. \textbf{Never} start a sentence with a symbol!
+
+
+\subsubsection{Citations}
+
+To cite a reference use the command \verb'\cite{We14}' as done here: \cite{We14}. Here \texttt{We14} is the so called BiB\TeX-Key. Have a look into the file ``S:/Standards/BibTex/rts''
+to see what that means. References usually are simply attached at the end of a statement, separated by a comma,
+\cite{We14}. Be aware that \LaTeX\ in general provides the command \verb'\cite'.
+
+\subsubsection{Index of Contents}
+
+The table of contents is generated automatically by \LaTeX. Therefore, each time you compile your main file, an \texttt{aux}-file (auxiliary) is generated that contains all 
+information for the table of contents. This file is embedded, when you compile a second time. This holds true for all references and any change you make with respect to these
+requires to compile twice. An intuitive and simplified explanation is that \LaTeX\ just ''reads'' your files from top to bottom, taking notes in the \texttt{aux}-file while doing so.
+When reading your files again, the notes tell \LaTeX\ that it came across some figure, table or equation before, just like you when studying a subject.
+
+
+\subsubsection{References}\label{b:subsecrefer}
+
+It is possible to refer to figures, equations, etc. like this: Figure~\ref{f:picfirstfigure}, Equation~(\ref{e:eqnsecond}),
+Sections~\ref{b:picturesubsection}. See how easy that is. This is one of the main advantages of \LaTeX!
+Note that ''Equation~(\ref{e:eqnsecond})'', e.g., is capitalized. It is regarded as the figures own name. Would you
+write your own name in lower case?
+
+While we are at it, have a look at the figure's caption. It uses capitalization like any other sentence in this document.
+Why? Because it is \textbf{not} a title, but a description.
+
+\subsubsection{Tables}
+
+Writing tables is probably the most cumbersome writing stuff in \LaTeX\ can get---and that is saying quite something!
+Have a close look at Table~\ref{t:table}. It does not use vertical rules and different line weights in respective places.
+This is the way to design tables. If you feel the need to use vertical rules, your table is probably not very readable in
+the first place.
+
+\begin{table}
+	\caption{A beautiful table}
+	\label{t:table}
+	\begin{center}
+	\begin{tabular}{ccccc}
+	\toprule
+                          	&        & \multicolumn{3}{c}{Columns} \\
+    \cmidrule{3-5}
+                            & Items  & A     & B     & C           \\
+    \midrule
+	\multirow{3}{*}{Rows}   & 1      & A1    & B1    & C1          \\
+	                        & 2      & A2    & B2    & C2          \\
+	                        & 3      & A3    & B3    & C3          \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+\end{table}
+
+Inform yourself about some basic rules on typesetting tables:
+
+\href{http://tug.org/pracjourn/2007-1/mori/mori.pdf}{``\textit{Tables in \LaTeX\ 2${}_\varepsilon$: Packages and Methods}''}.

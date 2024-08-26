@@ -1,0 +1,44 @@
+
+\newcommand\lw{0.75pt}
+
+\tikzstyle{block} = [draw, fill=white!20, rectangle, 
+    minimum height=3em, minimum width=5em, line width = \lw]
+\tikzstyle{dblock} = [draw, rectangle, 
+    minimum height=4.5em, minimum width=16em, line width = \lw]
+\tikzstyle{sum} = [draw, fill=white!20, circle, node distance=1cm, line width = \lw, inner sep = 0.075cm]
+\tikzstyle{bullet} = [draw, fill=black!100, circle, node distance=1cm, line width = \lw, inner sep = 0.04cm]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+\tikzstyle{branch} = [coordinate, bullet]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+
+% The block diagram code is probably more verbose than necessary
+\begin{tikzpicture}[auto, node distance=2.1cm,>=latex']
+    % We start by placing the blocks
+    \node [input, name=input] {};
+    \node [sum, right of=input] (sum) {};
+    \node [block, right of=sum, 
+    		node distance=2.5cm] (controller) {$C(s)$};
+    \node [block, right of=controller, 
+            node distance=3.5cm] (system) {$G(s)$};
+           
+
+    \draw [->, line width = \lw] (controller) -- node[name=u] {$u(t)$} (system);
+    \node [branch, right of=system, xshift = 1cm] (b1) {};
+    \node [output, above of=b1, xshift = 0cm] (o2)  {};
+    \node [output, right of=b1, xshift = -1cm] (o1) {};
+	\node [output, below of=sum, yshift = 0.8cm] (feedback) {};
+
+    % Once the nodes are placed, connecting them is easy. 
+    \draw [->, line width = \lw] (input) -- node {$r(t)$} (sum);
+    \draw [->, line width = \lw] (sum) -- node {$e(t)$} (controller);
+    \draw [->, line width = \lw] (system) -- node {$y(t)$} (o1);
+    \draw [-, line width = \lw] (b1) |- (feedback);
+    \draw [->, line width = \lw] (feedback) -- node[pos=0.98, swap] {$-$} (sum);
+    
+    \node [right of=controller, 
+            node distance=5.8cm] (l) {};
+    \node [dblock, dashed, right of=controller, node distance=1.75cm] (y){};
+	\node [above left of= l, yshift = -0.25cm, color=black] (ll) {$L(s)$};
+
+\end{tikzpicture}

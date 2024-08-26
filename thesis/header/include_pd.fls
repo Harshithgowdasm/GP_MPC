@@ -1,0 +1,11 @@
+PWD /home/jannis/Repos/Student Supervision/PA_Harshith_Gowda/thesis/header
+INPUT /etc/texmf/web2c/texmf.cnf
+INPUT /usr/share/texmf/web2c/texmf.cnf
+INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
+INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
+INPUT include_pd.tex
+OUTPUT include_pd.log
+INPUT /usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
+OUTPUT include_pd.pdf
+INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map

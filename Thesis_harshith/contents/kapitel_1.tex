@@ -1,0 +1,214 @@
+\section {Das Schreiben mit \LaTeX}
+\label{a:latex}
+
+\subsection{Das Besondere an \LaTeX}
+
+In diesem Kapitel werden Sie einige nützliche Hinweise zur
+Erstellung von Bachelor- oder Masterarbeiten mit \LaTeX\ erhalten.
+Wichtig zu wissen ist, dass \LaTeX\ kein WYSIWYG (what you see is
+what you get) Programm ist wie andere Texteditoren wie z.B.
+Microsoft Word. Es ist vielmehr eine Art Programmiersprache, mit
+der Sie den logischen Zusammenhang Ihres Textes durch geeignete
+Befehle zunächst beschreiben. Dieser ''Quellcode'' ist die sog.\
+\LaTeX-Datei.
+
+Es gibt wie bei Programmen eine compilierbare Datei für das
+Hauptprogramm und u.U.\ weitere Dateien für Unterprogramme, die
+eingebunden werden (sinnvollerweise sind das hier die Kapitel).
+Der Compiler erzeugt aus dem Quellcode entweder eine sog.\
+dvi-Datei (für ''device independent'') (\texttt{LaTeX}) oder direkt eine
+pdf-Datei (\texttt{pdfLaTeX}). Aus der dvi-Datei können Sie mit dem
+Programm \texttt{dvi2ps} dann eine Postscript-Datei erstellen, die dann auf
+geeigneten Druckern ausgedruckt werden kann.
+
+Dies gibt Ihnen z.B.\ auch die Möglichkeit im Quellcode Kommentare
+einzufügen, die im endgültigen Text nicht sichtbar sind. Es kommt
+dabei auch nicht auf die Zeilenumbrüche im Quellcode an, da diese
+erst durch den Compilierungsvorgang erzeugt werden. Das Layout der
+fertigen Arbeit können Sie getrost in der letzten Woche Ihrer Arbeit
+machen; wenn alle logischen Verknüpfungen und der Text als solcher
+sowie die Bilder stimmig sind, dauert das ca.\ einen bis zwei Tage. 
+Bedenken Sie, dass auch das Ausdrucken, ins Besondere bei farbigen 
+Seiten Zeit in Anspruch nimmt!
+
+Die Vorteile von \LaTeX\ werden ins Besondere bei Umstellungen des
+Textes und beim Formelsatz deutlich. Durch die logische
+Referenzierung stimmen die Referenzen immer, die Druckqualität von
+Formeln wird von anderen Programmen nicht erreicht. Die
+Einfachheit des Zitierens ist gerade für einen Anfänger sehr
+hilfreich.
+
+Der folgende Text als solcher ist nicht sonderlich sinnvoll, wenn
+Sie aber gleichzeitig die Datei mit dem Quellcode lesen, kann man
+sehr gut verstehen, wie verschiedene Elemente erzeugt werden. Sie
+sollten dann diese Datei auch selbst compilieren und das Ergebnis
+vergleichen. Wenn es nicht identisch ist, ist u.U.\ die
+\LaTeX-Konfiguration nicht korrekt und muss dann korrigiert werden.
+
+\subsection{Normaler Text}
+
+Normalen Text zu schreiben ist ganz einfach. Man nutzt einen
+beliebigen Editor und schreibt einfach den Text, ohne auf die
+Formatierung, Zeilenumbrüche etc. zu achten. Will man einen neuen
+Abschnitt beginnen, so lässt man einfach eine oder mehrere
+Leerzeilen...
+
+Hier sind wir nun im neuen Abschnitt. Die Schriftgröße wird
+übrigens im Kopfteil des Hauptdokumentes definiert. Man kann
+Hervorhebungen durch andere Schrifttypen machen. Normalerweise
+werden neu definierte Begriffe \textit{kursiv}, wichtige
+Aussagen \textbf{fett} und Programmzeilen im \texttt{Schreibmaschinenstil}
+gesetzt.
+
+\subsubsection{Gliederungsebenen}
+
+Man kann feinere Unterteilungen der Abschnitte durch den Befehl
+\texttt{subsubsection} erreichen. Diese Ebene sollte die unterste Ihrer
+Arbeit sein.
+
+\subsubsection*{Gleiche Ebene, aber nicht numeriert}
+
+Sehen Sie in den Quellcode, um zu wissen, wie das erreicht wird!
+
+\subsection{Besondere Objekte}
+
+
+\subsubsection{Abbildungen}\label{b:picturesubsection}
+
+Abbildung~\ref{f:picfirstfigure} zeigt ein Blockschaltbild.
+
+\begin{figure}[ht]		% h - here, t - top, b - bottom, p - page, ! - try hard
+  \centering
+  \afig{1}{figures/example}			% {scaling}{Figure from MATLAB, picture, etc.}
+  \caption{Das erste Bild}
+  \label{f:picfirstfigure}
+\end{figure}
+ 
+Weitere kostenlose Vektorgrafikprogramme sind
+\begin{itemize}
+	\item Inkscape,
+	\item \LaTeX Draw,
+	\item \textsc{Matlab} mit Matlab2Tikz
+	\item ...
+\end{itemize}
+
+Viele Bilder werden üblicherweise direkt unter \textsc{Matlab} erzeugt, bitte beachten Sie die
+Export-Optionen, die der Befehl ''print'' bietet. Sie können aber auch die Möglichkeiten von \textsc{Matlab2Tikz} nutzen. Siehe auch \href{https://github.com/matlab2tikz/matlab2tikz}{Github:Matlab2Tikz}. Sie können sowohl Blockdiagramme
+
+\begin{figure}[!ht]
+    \centering
+    \tikzfig{1}{closedloop_L}
+    \caption{Dies ist ein Blockdiagramm}
+    \label{fig:c1_closedloop_L}
+\end{figure}
+
+als auch Figures aus \textsc{Matlab}, die Sie mit den Befehlen in eine tex file umwandeln können.
+Sie solten aus Gründen der Geschwindigkeit und der Kompilierbarkeit auch den Befehl \texttt{cleanfigure} ausführen, um die Daten an die Auflösung zum Drucken anzupassen. Dieses reduiziert die Dateigröße drastisch.
+
+\begin{lstlisting}
+cleanfigure('targetResolution', 300);
+matlab2tikz(filename, 'width', '12cm', 'height','6cm');
+\end{lstlisting}
+
+\begin{figure}[!ht]
+    \centering
+    \setlength{\figw}{0.8\textwidth}
+    \setlength{\figh}{0.4\textwidth}
+    \tikzfig{1}{figure2}
+    \caption{Die ist eine Figure aus \textsc{Matlab} umgewandelt mit \textsc{Matlab2Tikz}}
+    \label{fig:c1_figure2}
+\end{figure}
+
+
+\subsubsection{Formeln}
+
+Formeln wie diese
+\begin{eqnarray}
+\ddot{\phi}_1
+    &=&
+    \frac{M_1+l_1 \sin \phi_2
+    (m_2 l_{s2} + m_3 l_{s3})
+    (\dot{\phi}_2^2+2 \dot{\phi}_1\dot{\phi}_2 )
+    -f_1 \dot{\phi}_1}
+    {\theta_1+\theta_2+\theta_3+2l_1 (m_1 l_{s2}+m_3 l_{s3} \cos \phi_2)+
+    m_3 (l_1^2+l_2^2)+m_l l_1^2}  \,,  \label{e:eqnfirst} \\
+\ddot{\phi}_2
+    &=&
+    \frac{M_2 + l_1 \sin \phi_2 (m_2 l_{s2} + m_3 l_{s3})
+    \dot{\phi}_1^2 +2 - \phi_2 \dot{\phi}_2}
+    {\theta_1+\theta_2+\theta_3} \, \label{e:eqnsecond}
+\end{eqnarray}
+können in schönem Satz ausgedruckt werden. Bitte beachten Sie,
+dass auch Formeln zu den Sätzen gehören und ebenso Satzzeichen
+enthalten können!
+
+
+\subsubsection{Symbole}
+
+Symbole wie $\Omega$ können auch einfach in den Fliesstext mit
+aufgenommen werden. Sätze fangen {\bf nie} mit einem Symbol an!
+
+
+\subsubsection{Zitate}
+
+Zitate werden einfach mit Komma an den Satz angehängt,
+\cite{We14}. Nachdem man das Programm BiB\TeX\ aufgerufen hat, wird
+das Literaturverzeichnis automatisch erstellt. Die Auswahl eines
+Zitierstiles erfolgt in der Haupt-Datei.
+
+
+\subsubsection{Inhaltsverzeichnis}
+
+Das Inhaltsverzeichnis wird automatisch durch \LaTeX\ erstellt. Dazu
+schreibt das Programm bei jedem Compilierungslauf sog.\
+\texttt{aux}-Dateien (auxiliary), die alle für das Inhaltsverzeichnis
+wichtigen Elemente enthalten. Diese Dateien werden dann beim
+nächsten Compilieren mit eingebunden. Das gleiche passiert mit allen
+Referenzen auf Abbildungen, Formeln, etc. Eine leicht vereinfachte, aber
+intuitive Erklärung besteht darin, dass sich \LaTeX\ gewissermaßen Notizen
+macht während es Ihren Text von oben nach unten durchließt. Beim zweiten
+Durchgang enthält der Notizblock die Information, die zum Schließen der
+Verbindungen benötigt werden. Fast so, wie wenn Sie ein Vorlesungsskript studieren...
+
+
+\subsubsection{Referenzen}\label{b:subsecrefer}
+
+Man kann auf Abbildungen wie die Abbildung~\ref{f:picfirstfigure}, 
+Gleichungen~(\ref{e:eqnsecond}), oder ganze Abschnitte~\ref{b:picturesubsection}
+verweisen. Sehen Sie, wie das geht? Hierin liegt die eigentliche
+Stärke des Programms!
+
+Übrigens sind die Beschriftungen unter den Abbildungen nicht wie Titel kapitalisiert, weil
+es sich um Beschreibungen und nicht um Titel handelt.
+
+
+\subsubsection{Tables}
+
+Tabellen zu erzeugen ist so ziemlich das aufwändigste, was man beim Schreiben einer Arbeit 
+in \LaTeX\ tun muss---und das sagt etwas über die Eleganz und Einfachheit von \LaTeX \ aus!
+
+Bei genauem Hinschauen erkennt man, dass Tabelle~\ref{t:table} keine vertikalen und horizontale Trennstriche unterschiedlicher Linienstärken verwendet.
+So sollten Tabellen aussehen. Fühlt man sich in der Verlegenheit, vertikale Trennstriche einzusetzen, ist vermutlich das gesamte
+Tabellendesign nicht sonderlich gut leserlich.
+
+\begin{table}
+	\caption{Eine wunderschöne Tabelle}
+	\label{t:table}
+	\begin{center}
+	\begin{tabular}{ccccc}
+	\toprule
+                          	&        & \multicolumn{3}{c}{Spalten} \\
+    \cmidrule{3-5}
+                            & No.    & A     & B     & C           \\
+    \midrule
+	\multirow{3}{*}{Zeilen} & 1      & A1    & B1    & C1          \\
+	                        & 2      & A2    & B2    & C2          \\
+	                        & 3      & A3    & B3    & C3          \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+\end{table}
+
+Hier kann man sich über grundlegende Regeln für guten Tabellensatz informieren:
+
+\href{http://tug.org/pracjourn/2007-1/mori/mori.pdf}{``\textit{Tables in \LaTeX\ 2${}_\varepsilon$: Packages and Methods}''}.

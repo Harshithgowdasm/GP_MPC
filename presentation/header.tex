@@ -1,0 +1,136 @@
+\documentclass[compress,aspectratio=169]{beamer}
+
+\mode<presentation>
+{
+  \usetheme{RT}
+  \setbeamercovered{transparent}
+  \usecolortheme{RT}
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]{}
+
+
+\usepackage{ifthen}
+\ifthenelse{\equal{\isenglish}{true}}{
+	%%% English
+	\usepackage[german, ngerman, english]{babel}
+	\selectlanguage{english}
+}{
+	%%% German
+	\usepackage[english, german, ngerman]{babel}
+	\selectlanguage{german}
+}
+
+\usepackage{lmodern}
+\usepackage{csquotes}
+\usepackage{microtype}
+\ifluatex
+	\usepackage{fontspec}
+\else
+	\usepackage[utf8]{inputenc}
+\fi
+
+%% Allow usage of the part command to create different navigations parts 
+\usepackage{xpatch}
+\makeatletter
+\xpatchcmd{\beamer@part}{\Hy@writebookmark{\the\c@section}{#1}{Outline\the\c@part}{1}{toc}}{}{}{}
+\makeatother
+
+\usepackage{appendixnumberbeamer}
+
+\makeatletter
+\AtBeginPart{%
+  \beamer@tocsectionnumber=0\relax
+  \setcounter{section}{0}
+%   \frame{\partpage}%
+}
+\makeatother
+
+
+ %%######## GRAPHICS Options
+\graphicspath{{figures/}}				% Define the path to the figures
+
+\usepackage{ifpdf}
+
+ % Other figures (e.g., MATLAB  EPS or PDF figures)
+\newcommand{\afig}[2]{\includegraphics[scale=#1]{#2}}
+
+ % figures defined in TeX files
+\newcommand{\tfig}[2]{\scalebox{#1}{\input{"#2.tex"}}}
+
+
+\usepackage{tikz}
+
+\usetikzlibrary{%
+  arrows,%
+  arrows.meta,
+  shapes.misc,% wg. rounded rectangle
+  shapes.arrows,
+  shapes.misc,
+  calc,
+  plotmarks,
+  chains,%
+  matrix,%
+  positioning,% wg. " of "
+  scopes,%
+  decorations.pathmorphing,% /pgf/decoration/random steps | erste Graphik
+  decorations.markings,
+  shadows%
+}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=figures/] % activate!
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\newlength{\figw}
+\setlength{\figw}{0.8\textwidth}
+\newlength{\figh}
+\setlength{\figh}{0.4\textwidth}
+
+\newcommand{\tikzfig}[2]{
+  \tikzsetnextfilename{#2}%
+  \scalebox{#1}{
+    \input{"figures/#2.tex"}}
+}
+
+ %%######## Logos only on Title page
+
+\titlegraphic{
+	% \vspace{1cm}
+	\begin{minipage}{0.5\textwidth}
+		\begin{flushleft} \large
+			\ifthenelse{\equal{\isenglish}{true}}
+			{\includegraphics[height=1.5cm]{admin/Logo_TUHH_en}}
+			{\includegraphics[height=1.5cm]{admin/Logo_TUHH_de}}
+		\end{flushleft}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushright} \large
+			\includegraphics[height=1.5cm]{admin/Logo_ICS_4c} % Supervisor's Name
+		\end{flushright}
+	\end{minipage}\\[0.4cm]
+}
+
+ %%######## Other FUNCTIONS
+
+ % Some color definitions
+\setbeamercolor{greenhead}{fg=white,bg=green!80!black}%
+\setbeamercolor{greenbody}{fg=black,bg=green!50!white}%
+
+\setbeamercolor{redhead}{fg=white,bg=red!80!black}%
+\setbeamercolor{redbody}{fg=black,bg=red!50!white}%
+
+
+\usepackage{epstopdf}
+
+\usepackage[style=ieee,backend=biber]{biblatex} %% bibliography
+% \usepackage{biblatex}
+
+\usepackage{multicol}
+\usepackage{subfig}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows, positioning}

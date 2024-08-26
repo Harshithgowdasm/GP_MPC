@@ -1,0 +1,22 @@
+ % Project description
+\def\projectdescription{
+	Model predictive control (MPC) has gained more attention in the past years as it is a powerful modern control technique which relies on repeatedly solving an open-loop optimal control problem. In order to obtain high-quality optimal input signals, an accurate prediction model is required, which is often unavailable or difficult to identify. In recent years data-driven control approaches have become more interesting because they use only measured data to control unknown systems without prior model identification. A major issue in data-driven control is the treatment of measurement noise, which in recent publications is treated to be deterministically bounded \cite{Berberich_2021}.  However, this assumption does not generally hold for a real system.
+	
+	Alternatively, a stochastic model can be used to model the state transition function as in \cite{kamthe2018}. However, there is a lack of theoretical guarantees of proabalistic models, e.g., Gaussian processes.
+	
+	The goal of this thesis is to implement a probabilistic MPC scheme relying on Gaussian process models to represent the transition function of a nonlinear time-discrete system with noisy measurements. Therefore, a multioutput Gaussian process model consisting of independent subprocesses is considered. A challenge is the definitions of suitable constraints for the optimization procedure, e.g., state constraints, since states are no longer deterministic but stochastically distributed. 
+	
+	Within the scope of the work, a literature review on Gaussian processes and probabilistic MPC will first be conducted. Then, the method should will be implemented and tested in simulation. If this was successful, the algorithm should be tested on a real plant. Finally, the experimental data will be evaluated and the results obtained will be discussed. 
+}
+
+ % Project tasks
+\def\tasks{
+\begin{packedenumerate}
+	\item Literature review
+	\item Familiarization with Gaussian processes and MPC 
+	\item Implementation of the probabilistic MPC algorithm
+	\item Comparison to other (probabilistic) MPC algorithms/implementations
+	\item Testing in simulation and, if successful, testing on a real plant
+	\item Evaluation and discussion
+\end{packedenumerate}
+}

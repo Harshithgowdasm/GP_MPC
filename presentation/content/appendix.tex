@@ -1,0 +1,144 @@
+\section{Appendix}
+\begin{frame}
+    \frametitle{GP prior}
+    assumes a prior that function values behave according to
+    \begin{equation}\label{eq:prior_function}
+        p(f | x_1, x_2, \ldots, x_n) = \mathcal{N} (0, K(\mathbf{x_1},  \mathbf{x_2})), 
+    \end{equation}
+    where $f = [f_1, f_2, \ldots, f_n]^{\top}$ is a vector of latent function values, $f_i = f(\mathbf{x_i})$, and $K(\mathbf{x_1}, \mathbf{x_2})$ is a covariance matrix, whose entries are given by the covariance function, $K(\mathbf{x_1}, \mathbf{x_2})_{ij} = k(\mathbf{x_i}, \mathbf{x_j})$.
+    \begin{equation}\label{eq:covariance_function}
+        K_{ij} = k(\mathbf{x_i}, \mathbf{x_j}) = \sigma_f^2 \exp\left( -\frac{(\mathbf{x_i} - \mathbf{x_j})^2}{2l^2} \right),
+    \end{equation}
+    where $\sigma_f^2$ controls the prior variance, and $l$ is an isotropic lengthscale parameter that controls the rate of decay of the covariance
+
+\end{frame}
+
+\begin{frame}{Gaussian Process Regression}
+    \begin{itemize}
+        \item Ex 1, \(x^* = [0,1]^T \) , \( f(x^*) = [0, 0] \), \(\mathcal{N}\left(\begin{bmatrix}0 \\0\end{bmatrix}, \begin{bmatrix}1 & 0.607 \\0.607 & 1 \end{bmatrix}\right)\)
+        \item Ex 2, \(x^* = [0,2]^T \) , \( f(x^*) = [0, 1] \), \(\mathcal{N}\left(\begin{bmatrix}0 \\1\end{bmatrix}, \begin{bmatrix}1 & 0.135 \\0.135 & 1 \end{bmatrix}\right)\)
+    \end{itemize}
+        \begin{figure}[!tbp]
+        \centering
+        \includesvg[width=0.6\columnwidth]{figures/GP/bivariateGD}\label{fig:f1}
+    \end{figure}
+    
+\end{frame}
+
+\begin{frame}{Maximizing Marginal likelihood Method}
+    Following the GP assumption, the distribution of the training outputs is
+given as
+
+\begin{equation}
+p(y|X, \theta) = \mathcal{N} (0, \Sigma_{\theta}),
+\end{equation}
+
+where $\Sigma_{\theta} = K + \sigma^2_n I$ and $\theta$ is the collection of the unknown hyperparameters. Therefore, the negative log marginal likelihood (nlml) is
+
+\begin{equation}
+L(\theta) = - \log p(y|X, \theta) = \frac{1}{2} y^T \Sigma^{-1}_{\theta} y + \frac{1}{2} \log \det \Sigma_{\theta} + \frac{n}{2} \log 2\pi,
+\end{equation}
+
+and the partial derivatives of nlml with respect to the hyperparameters are given
+by
+
+\begin{equation}
+\frac{\partial}{\partial \theta_i} L(\theta) = \frac{1}{2} \mathrm{tr} \left( \Sigma^{-1}_{\theta} \frac{\partial \Sigma_{\theta}}{\partial \theta_i} \right) - \frac{1}{2} y^T \Sigma^{-1}_{\theta} \frac{\partial \Sigma_{\theta}}{\partial \theta_i} \Sigma^{-1}_{\theta} y.
+\end{equation}
+
+\end{frame}
+
+
+
+
+
+\begin{frame}{Moment Matching Approximation}
+
+\begin{itemize}
+    \item Alternatively, the posterior distribution \( p(f|x, \mathbf{X}, \mathbf{D}) \) can be approximated as a Gaussian by calculating its mean and variance.
+    \item Several methods exist for this Gaussian approximation, such as Moment Matching and linearization of the posterior GP mean function. %\cite{marc2015robotics}.
+    \item Moment Matching computes the first two moments of the predictive distribution exactly, whereas linearization provides a computationally efficient approximation by explicitly linearizing the posterior GP.
+    \item Moment Matching is better than linearization, we will focus on the Moment Matching Gaussian approximation.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Mean Prediction}
+    Following the law of iterated expectations, for target dimensions \( a = 1,..., D \) we obtain the predictive mean:
+
+\begin{equation}\label{eq:mu}
+\begin{aligned}
+\mu_t^a & =\mathbb{E}_{\tilde{\boldsymbol{x}}_{t-1}}\left[\mathbb{E}_{f_a}\left[f_a\left(\tilde{\boldsymbol{x}}_{t-1}\right) \mid \tilde{\boldsymbol{x}}_{t-1}\right]\right]=\mathbb{E}_{\tilde{\boldsymbol{x}}_{t-1}}\left[m_{f_a}\left(\tilde{\boldsymbol{x}}_{t-1}\right)\right] \\
+& =\int m_{f_a}\left(\tilde{\boldsymbol{x}}_{t-1}\right) \mathcal{N}\left(\tilde{\boldsymbol{x}}_{t-1} \mid \tilde{\boldsymbol{\mu}}_{t-1}, \tilde{\boldsymbol{\Sigma}}_{t-1}\right) d \tilde{\boldsymbol{x}}_{t-1} \\
+& =\boldsymbol{\beta}_a^T \boldsymbol{q}_a 
+% \boldsymbol{\beta}_a & =\left(\boldsymbol{K}_a+\sigma_{w_a}^2\right)^{-1} \boldsymbol{y}_a
+\end{aligned}
+\end{equation}
+where, \quad $\boldsymbol{\beta}_a =\left(\boldsymbol{K}_a+\sigma_{w_a}^2\right)^{-1} \boldsymbol{y}_a ,$ \quad \quad $
+  \boldsymbol{q}_a=\left[q_{a_1}, \ldots, q_{a_n}\right]^T$. 
+\begin{equation}\label{eq:mu_qa}
+\begin{aligned}
+q_{a_i} & =\int k_a\left(\tilde{\boldsymbol{x}}_i, \tilde{\boldsymbol{x}}_{t-1}\right) \mathcal{N}\left(\tilde{\boldsymbol{x}}_{t-1} \mid \tilde{\boldsymbol{\mu}}_{t-1}, \tilde{\boldsymbol{\Sigma}}_{t-1}\right) d \tilde{\boldsymbol{x}}_{t-1} \\
+& =\sigma_{f_a}^2\left|\tilde{\boldsymbol{\Sigma}}_{t-1} \boldsymbol{\Lambda}_a^{-1}+\boldsymbol{I}\right|^{-\frac{1}{2}} \exp \left(-\frac{1}{2} \boldsymbol{\nu}_i^T\left(\tilde{\boldsymbol{\Sigma}}_{t-1}+\boldsymbol{\Lambda}_a\right)^{-1} \boldsymbol{\nu}_i\right),
+\end{aligned}
+\end{equation}
+
+where we define
+\begin{equation}\label{eq:difference_vi}
+    \nu_i:=\left(\tilde{\boldsymbol{x}}_i-\tilde{\boldsymbol{\mu}}_{t-1}\right)
+\end{equation}
+\end{frame}
+
+
+\begin{frame}{Covariance Matrix Prediction}
+    The Predictive covariance matrix $\mathbf{\Sigma}_{\Delta} \in \mathbb{R}^{D \times D}$ is given by 
+    \begin{equation}
+    \sum (:) = 	\begin{bmatrix}
+                        \sigma_{a a}^2 & \sigma_{a b}^2 &......\\
+                        \sigma_{a b}^2 & \sigma_{b b}^2 &......\\
+                        .&.& ......\\
+                        .&.& ......\\
+                        \end{bmatrix}_{DxD}
+\end{equation}
+where, 
+\begin{equation}\label{eq:sigma_aa}
+\sigma_{a a}^2  =\mathbb{E}_{\overline{\boldsymbol{x}}_t}\left[\operatorname{var}_f\left[\Delta_a \mid \tilde{\boldsymbol{x}}_t\right]\right]+\mathbb{E}_{f, \overline{\boldsymbol{x}}_t}\left[\Delta_a^2\right]-\left(\boldsymbol{\mu}_{\Delta}^a\right)^2,
+\end{equation}
+\begin{equation}\label{eq:sigma_ab}
+    \sigma_{a b}^2 =\mathbb{E}_{f, \overline{\boldsymbol{x}}_t}\left[\Delta_a \Delta_b\right]-\boldsymbol{\mu}_{\Delta}^a \boldsymbol{\mu}_{\Delta}^b, \quad a \neq b,
+\end{equation}
+
+\begin{equation}\label{eq:Eab}
+\begin{aligned}
+\mathbb{E}_{f, \overline{\boldsymbol{x}}_t}\left[\Delta_a \Delta_b\right] & =\mathbb{E}_{\overline{\boldsymbol{x}}_t}\left[\mathbb{E}_f\left[\Delta_a \mid \tilde{\boldsymbol{x}}_t\right] \mathbb{E}_f\left[\Delta_b \mid \tilde{\boldsymbol{x}}_t\right]\right] \\
+& {=} \int m_f^a\left(\tilde{\boldsymbol{x}}_t\right) m_f^b\left(\tilde{\boldsymbol{x}}_t\right) p\left(\tilde{\boldsymbol{x}}_t\right) \mathrm{d} \tilde{\boldsymbol{x}}_t \\
+& =\boldsymbol{\beta}_a^{\top} \boldsymbol{Q} \boldsymbol{\beta}_b,
+\end{aligned}
+\end{equation}
+\end{frame}
+
+\begin{frame}{Covariance Matrix Prediction}
+    
+\begin{equation}\label{eq:Q_integral}
+    \boldsymbol{Q}:=\int k_a\left(\tilde{\boldsymbol{x}}_t, \tilde{\boldsymbol{X}}\right)^{\top} k_b\left(\tilde{\boldsymbol{x}}_t, \tilde{\boldsymbol{X}}\right) p\left(\tilde{\boldsymbol{x}}_t\right) \mathrm{d} \tilde{\boldsymbol{x}}_t .
+\end{equation}
+
+Using standard results from Gaussian multiplications and integration, we obtain the entries $Q_{i j}$ of $Q \in \mathbb{R}^{n \times n}$
+\begin{equation}\label{eq:Qij}
+    Q_{i j}=|\boldsymbol{R}|^{-\frac{1}{2}} k_a\left(\tilde{\boldsymbol{x}}_i, \tilde{\boldsymbol{\mu}}_t\right) k_b\left(\tilde{\boldsymbol{x}}_j, \tilde{\boldsymbol{\mu}}_t\right) \exp \left(\frac{1}{2} \boldsymbol{z}_{i j}^{\top} \boldsymbol{T}^{-1} \boldsymbol{z}_{i j}\right)
+\end{equation}
+
+where we define
+$\qquad \boldsymbol{R}  :=\tilde{\boldsymbol{\Sigma}}_t\left(\boldsymbol{\Lambda}_a^{-1}+\boldsymbol{\Lambda}_b^{-1}\right)+\boldsymbol{I}, \qquad \boldsymbol{T}:=\boldsymbol{\Lambda}_a^{-1}+\boldsymbol{\Lambda}_b^{-1}+\tilde{\boldsymbol{\Sigma}}_t^{-1}, \\ \boldsymbol{z}_{i j} :=\boldsymbol{\Lambda}_a^{-1} \boldsymbol{\nu}_i+\boldsymbol{\Lambda}_b^{-1} \boldsymbol{\nu}_j,$
+
+From (\ref{eq:sigma_aa}), we see that the diagonal entries contain the additional term
+\begin{equation}\label{eq:E_xa}
+\mathbf{E}_{\overline{\boldsymbol{x}}_t}\left[\operatorname{var}_f\left[\Delta_a \mid \tilde{\boldsymbol{x}}_t\right]\right]=\sigma_{f_a}^2-\operatorname{tr}\left(\left(\boldsymbol{K}_a+\sigma_{w_a}^2 \boldsymbol{I}\right)^{-1} \boldsymbol{Q}\right)+\sigma_{w_a}^2
+\end{equation}
+ $\sigma_{w_a}^2$ being the system noise variance of the $a$th target dimension. 
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+

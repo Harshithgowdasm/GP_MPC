@@ -1,0 +1,551 @@
+\section{Simulation Results}	\label{sec:results_rts_en}
+
+This section primarily focuses on the application of the GP-MPC framework to two well-known examples: the DC motor and the Van der Pol oscillator. The main advantage of the GP-MPC framework lies in its versatility, as it can be applied to a wide range of systems, whether linear or nonlinear, with or without uncertainty, and with or without noisy measurements. Model uncertainty refers to parameter variations and external disturbances that affect the system's behavior. These mathematical uncertainty models represent all aspects of real-world systems, leading to uncertainty in predicting their behavior. To demonstrate its effectiveness, we have chosen to implement the GP-MPC framework on both a linear system, the DC motor, and a nonlinear system, the Van der Pol oscillator.
+
+For each system, the following results are plotted and compared:
+
+\begin{itemize}
+    \item Validation of the GP model and the long-term prediction model, ensuring their accuracy in predicting system behavior.
+    \item Modeling without uncertainty, where the system dynamics are described by deterministic equations.
+    \item Modeling with uncertainty, where stochastic elements and uncertainty parameters are introduced into the system equations to simulate real-world scenarios.
+\end{itemize}
+In validation of the Gaussian Process (GP) model, the posterior mean is used to predict the states. while in the validation of the long-term prediction model, Algorithm \ref{alg:long_term_prediction} is used to predict states and each time step. To provide a comprehensive comparison, we also directly apply Model Predictive Control (MPC) to the dynamics of each system. By comparing the results of GP-MPC with direct MPC, we can evaluate the performance of the learning process within the GP-MPC framework. By examining these results, we can gain insights into the performance of the GP-MPC framework and its ability to adapt to different system characteristics and conditions.
+
+
+\subsection{DC Motor}
+DC motors offer an appealing option over AC servo motors for demanding motion control tasks, particularly in low-power, high-precision applications due to their cost-effectiveness and simplicity in management. Conventionally, industrial motor controls employ a cascade control setup, where outer speed and inner current control loops are typically designed using PD or PI controllers. The cascade control setup consists of a parallel controller with an inner current loop and an outer speed loop. However, the authors assume that the inner current loop controller is sufficiently faster than the outer speed loop controller \cite{chevrel1996switched}. 
+
+Recent literature suggests alternative strategies for identifying and controlling DC motors. Umeno and Hori \cite{umeno1991robust} introduce a generalized speed control design approach for DC servomotors, utilizing the parametrization of two-degree-of-freedom controllers. They apply this method, incorporating a Butterworth filter, to ascertain controller parameters.
+
+The angular velocity, $\omega =\dot{\theta}$, is regulated by the input voltage, $v$, with a consistent voltage drop attributed to brush and rotor resistance, along with a back-electromotive force (EMF) stemming from the rotary armature. The motor inductance contributes proportionally to the change in motor current, $i$. Motor current links the electrical and mechanical components, generating driving torque. This torque is counteracted by motor inertia, structural damping, friction, and external loads\cite{suman2016speed}.
+
+There are nonlinear effects, which can significantly impact the dynamic behavior of the modeled system. Hence two major assumptions are made, firstly the magnetic circuit is linear and another assumption is that the mechanical friction is only linear in the motor speed. These assumptions help to simplify the DC motor model and make it more amenable to Gp-MPC controller design \cite{puig2016identification}. 
+
+The motor dynamics are defined by:
+
+\begin{equation} \label{eq:dc_motor_dynamics_1}
+    V(t) = L\frac{di}{dt} + R_m i(t) + K_e \omega(t)
+\end{equation}
+
+\begin{equation} \label{eq:dc_motor_dynamics_2}
+    % K_m i(t) = J\frac{d\omega}{dt} + K_d \omega(t) + \tau_l + \tau_f
+    \frac{d\dot{\theta}}{dt} = -\frac{b_v}{J} \dot{\theta} + \frac{K_m}{J} i 
+\end{equation}
+
+
+Where $K_m$, $K_e$, and $b_v$ represent the motor torque, back-EMF, and damping constants respectively. $J$ denotes mechanical inertia including the motor armature and shaft. $L$ and $R_m$ represent motor inductance and total connection resistance.
+
+To find the physical parameters such as $K_m$, $K_e$, $b_v$,, $R_m$ and $J$, the experiment is conducted in this \cite{werner2023grt}, where the friction and induction are neglected ($b_v=0$,$L=0$). This experiment was conducted on one specific DC motor, where the transfer function for that specific device is formed by applying a voltage to the DC motor and measuring angular velocity. Finding the motor physical parameters from known measured data. The final transfer function of the DC motor found using the experiment \cite{werner2023grt} is 
+\begin{equation} \label{eq:dc_motor_tf}
+    G(s) = \frac{21}{s(1.1s + 1)}
+\end{equation}
+
+From the DC motor transfer function Equation (\ref{eq:dc_motor_tf}), state-space equations are modeled in continuous time Equation (\ref{eq:dc_w_noise_x_dot}).
+
+\begin{equation} \label{eq:dc_w_noise_x_dot}
+\begin{aligned}
+        & \dot{x} = \begin{bmatrix}
+        -0.9091 & 0 \\ 
+        1 & 0
+    \end{bmatrix} x + \begin{bmatrix}
+        4 \\ 0
+    \end{bmatrix} u \\
+   & y = \begin{bmatrix}
+        0 & 4.7727
+    \end{bmatrix} x
+\end{aligned}
+\end{equation}
+
+As discussed before, the Model Predictive Control (MPC) can primarily be applied to discretized systems, it's worth noting that discrete-time models offer certain advantages. Some approaches implement MPC in continuous time systems \cite{truong2007continuous}. The discrete systems are straightforward to implement for digital controllers and are essential for stable control system design. Moreover, they find extensive use in digital communication systems, contributing significantly to various engineering applications.
+
+As discussed before we consider discrete-time model due to their alignment with sampled data, compatibility with digital systems, computational efficiency, and availability of analysis tools. They offer straightforward implementation for digital controllers and are essential for stable control system design. Additionally, they are well-suited for digital communication systems, making them indispensable in various engineering applications. The continuous time model Equation (\ref{eq:dc_w_noise_x_dot}) is converted to a discrete-time model with a sampling time of $T_s=0.1s$ with exact discretization method(zoh), as outlined in the equation (\ref{eq:dc_w_noise_xk+1}).
+
+\begin{equation} \label{eq:dc_w_noise_xk+1}
+\begin{aligned}
+        & x_{k+1} = \begin{bmatrix}
+        0.9131 & 0 \\ 
+        0.0956 & 1
+    \end{bmatrix} x_k + \begin{bmatrix}
+        0.3824 \\ 0.0194
+    \end{bmatrix} u_k \\
+    & yk = \begin{bmatrix}
+        0 & 4.7727
+    \end{bmatrix} x_k
+\end{aligned}
+\end{equation}
+
+The discrete-time equation represents a system used for generating data. It consists of state equations and output equations. The output equations are ignored and considered the state equation for modeling the GP-MPC controller. Now, the state update ($X_{k+1}$) is the output data, whereas the augmented matrix $\tilde{X_k}=[X_k,U_k]$ is the input data. It has two states, the first state ($x_1$) is the angular velocity ($\dot{\theta}$), and the second state ($x_2$) is the angle ($\theta$) whereas the control input is voltage ($v$). we assumed initial states are $x_1 = 0$ and $x_2=\pi$ and the random control input is applied to the plant Equation (\ref{eq:dc_w_noise_xk+1}) and states are measured. The size of the generated data is very small with 20 interactions. A small data set is used to validate our model data efficiency. Taking a small set of data can be advantageous for resource efficiency, faster learning, and focus on important features, while still gaining valuable insights and informing decision-making processes.
+
+\subsubsection{Validation of DC Motor Learning}
+
+Validation of Gaussian Process (GP) and Long-term prediction models is crucial to assess their reliability and accuracy. The accuracy of the long-term prediction model ultimately relies on the reliability of the GP model. GP models serve as valuable tools for regression, particularly when dealing with limited data, robust models, or noisy data. Therefore, we will focus on a plant with noisy measurements. Additionally, we will consider parameter uncertainty\cite{dulau2016dc}, resulting in modified plant state equations as follows:
+
+\begin{equation} \label{eq:dc_uncert_xk+1}
+\begin{aligned}
+        & x_{k+1} = A_d x_k + B_d u_k + \epsilon_d\\
+    & \text{where,} \\
+    & A_d = A + \lambda_a A \\
+    & B_d = B + \lambda_b B
+\end{aligned}
+\end{equation}
+
+Here, $A_d$ and $B_d$ matrices represent disturbed matrices affected by uncertainty variables $\lambda$. The $\lambda_a$ and $\lambda_b$ are small parameters representing model uncertainty. To validate the Gaussian model under realistic conditions, we set $\lambda_a$ and $\lambda_b$ as $-0.1$*random distribution in the interval (0,1), introducing maximum uncertainty to the plant dynamics. The $\epsilon_d$ is Gaussian noise, which is a small number in the order of $10^{-3}$. Thus, the new model incorporates model uncertainty and measurement noise, resembling a realistic plant scenario.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/data_points_test_dc}
+    \caption{Training set,$X_{k+1}$ and $U_k$ for model learning validation generated using DC motor uncertainty model}
+    \label{fig:data_points_gp_test}
+\end{figure}
+
+
+The data was generated using the uncertain plant model in Equation \ref{eq:dc_uncert_xk+1} for a random set of input $u_k$. The data $X_k$ and $U_k$ are augmented and used as input for the GP training model, while $X_{k+1}$ acts as output. The generated data is plotted in Figure \ref{fig:data_points_gp_test}. With a dataset size of 20, which is relatively small for model training, it's suitable for validation purposes.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/gp_test_dc}
+    \caption{Gaussian Process model testing of DC motor }
+    \label{fig:GP_model_testing}
+\end{figure}
+
+The trained GP model is tested with 60 random inputs $\hat{u_k}$. At each time step k, $x_k,$ $u_k$ is used to predict $x_{k+1} $ and the only predicted mean is considered for the next prediction, the variance is neglected. The predicted mean and variances are plotted alongside the control input, as shown in Figure \ref{fig:GP_model_testing}. The predicted mean is compared with actual values from the uncertainty model (Equation \ref{eq:dc_uncert_xk+1}). The root mean square error (RMSE) is calculated using Equation (\ref{eq:rmse}) and RMSE values of state $x_1$ is 0.96\%, and for state $x_2$ is 2.11\%. The average variances of predicted $x_1$ and $x_2$ are $2.0262 \times 10^{-5}$ and $1.1588 \times 10^{-5}$ respectively. Both RMSE values and average variances are very small, indicating high accuracy. Overall, validation confirms that the GP model is reliable and accurate, and capable of making trustworthy predictions on unseen data in real-world scenarios.
+
+
+\begin{equation}\label{eq:rmse}
+    RMSE = \sqrt{\frac{\sum_{i=1}^{N} (Predicted_i - Actual_i)^2}{N}}
+\end{equation}
+
+
+
+ The model is tested with the same 60 random inputs $\hat{u_k}$. The predicted mean and variance are considered for the next prediction, where variance accounts for the reliability of the prediction. The predicted mean and control inputs are plotted in Figure \ref{fig:longterm_testing}. These predictions are compared with actual values from the uncertainty model Equation (\ref{eq:dc_uncert_xk+1}). The RMSE of state $x_1$ and state $x_2$ are 11.74\% and 57\% respectively.  
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/long_term_test_dc}
+    \caption{Longterm prediction model testing}
+    \label{fig:longterm_testing}
+\end{figure}
+
+The validation process conducted on the Gaussian Process (GP) model and long-term prediction model has provided valuable insights into their reliability and accuracy, particularly in the context of noisy and uncertain plant dynamics. The GP model, utilized for regression tasks, has demonstrated high reliability and accuracy in capturing the underlying dynamics of the plant. By incorporating parameter uncertainty and measurement noise, the GP model effectively adapts to realistic scenarios, as evidenced by the small root mean square error (RMSE) values and average variances for both states. The main difference between the Gaussian Process (GP) model and the long-term prediction model, is that the long-term prediction model takes input as gaussian \( \mathcal{N}( x^*, \Sigma_x^* ) \) and gives output as gaussian \( \mathcal{N}( x^*_{k+1}, \Sigma^*_{k+1} ) \), whereas GP prediction model gives gaussian output but it cant take gaussian as input, so only mean is given as input, neglecting the variance. Even though the GP model demonstrates higher predictive accuracy, it neglects variance, which provides critical insight into the reliability and confidence levels of the model's estimations.
+
+Moreover, the validation of the long-term prediction model is not perfect. In the early stages of the prediction horizon, the predictions are accurate, but as time progresses, the deviation becomes more pronounced due to the increase in the variance at each time step. Despite deviations from actual measurements, the Gaussian distributed predictions exhibit sufficient accuracy for modeling the GP-MPC controller because the considered prediction horizon is small. However, it's essential to acknowledge that as the prediction horizon increases, the effects of uncertainty and noisy measurements may lead to further discrepancies between predicted and actual values. Overall, the validation process confirms the reliability and accuracy of the GP model and long-term prediction model for making trustworthy predictions in real-world scenarios with noisy and uncertain data for linear models. 
+
+% These models serve as valuable tools for regression and control tasks, facilitating informed decision-making and control strategies in various practical applications.
+
+
+
+
+\subsubsection{Modelling Without Uncertainty}  
+
+Modeling a system without uncertainty typically involves focusing solely on its deterministic aspects, disregarding any stochastic or random disturbances. Such a deterministic model accurately captures the system's behavior without considering noise or disturbances, facilitating analysis and simulation under ideal conditions.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/data_points_wo_dc}
+    \caption{Data points from a noise-free DC motor plant}
+    \label{fig:data_points_wo_noise}
+\end{figure}
+
+In contrast to systems affected by noise, noise-free systems allow for clearer insights into the underlying dynamics and behavior. By eliminating stochastic influences, deterministic models provide a precise framework for understanding the system's response to inputs and its evolution over time. This clarity is particularly advantageous in scenarios where noise is either negligible or can be effectively accounted for through other means, such as through robust filtering techniques or noise compensation strategies.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/gp_mpc_wo_1}
+    \caption{GP-MPC controller- noise free DC motor plant without parameter uncertainty}
+    \label{fig:GPMPC_DC_wo_noise}
+\end{figure}
+
+The dataset was generated using the standard plant model without any additional noise, as described in Equation (\ref{eq:dc_w_noise_xk+1}), with a randomly selected set of input values $u_k$. The dataset, consisting of $X_k$ and $U_k$, was then combined and utilized as input for training the Gaussian Process (GP) model, while $X_{k+1}$(generated data) served as the output. The resulting dataset, comprising 20 data points, is visually represented in Figure \ref{fig:data_points_wo_noise}.
+
+As discussed in Section \ref{sec:controllerdesign}, the optimal control problem for the DC motor can be represented by Equation (\ref{eq:modified_ocp_dc}).
+
+\begin{equation} \label{eq:modified_ocp_dc}
+    \begin{aligned}
+ & \underset{u^*_k}{\text{minimize}} \ J(k) = \sum_{k=i}^{i+N-1}( x_{k+1}^T Q x_{k+1} + u_k^T R u_k )  \\
+ \text{subject to}\\
+& x_{k+1} =  A x_k + B u_k \quad \text{for } k=i \\
+& x_0 = X_{k+1}(end) \quad  \text{//end point of dataset} \\
+& -10 \leq u_k \leq 10 \quad \text{for } k=i,\ldots,i+N-1 \\
+& u_0 = U_k(end) \\
+\end{aligned}
+\end{equation}
+
+ Here, the objective is to control the states angle and angular velocity, aiming to minimize the states to zero with minimal control input. The optimal control problem is defined over a prediction horizon of 15 timesteps. The initial states and control input are given as the end point of the dataset, and the initial control input for GP-MPC controller constraint is defined as $-10 \leq u_k \leq 10$. The weighting matrices $Q$ and $R$ are adjusted to ensure that the controller operates quickly with minimal input.
+
+
+The application of GP-MPC to the noise-free(without measurement noise) DC motor system, as illustrated in Figure \ref{fig:GPMPC_DC_wo_noise}, further demonstrates the efficacy of deterministic modeling in control design. Through iterative optimization, the GP-MPC controller leverages the noise-free system dynamics to achieve precise control performance, even in the absence of stochastic disturbances.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/f_mpc_wo_dc}
+    \caption{f-MPC controller- DC motor plant without uncertainty}
+    \label{fig:fmpc_dc_wo_noise}
+\end{figure}
+
+The same Model Predictive Control (MPC) framework is applied to the dynamics function of the DC motor described by Equation (\ref{eq:dc_w_noise_xk+1}), with identical optimal control problem formulations and constraints as represented in Equation (\ref{eq:modified_ocp_dc}). These results are depicted in Figure \ref{fig:fmpc_dc_wo_noise}. Direct MPC results are compared against GP-MPC results to ensure the accuracy of the learning process of GP-MPC framework. The comparison between the plots in Figure \ref{fig:GPMPC_DC_wo_noise} and Figure \ref{fig:fmpc_dc_wo_noise} reveals that the behavior of the GP-MPC closely resembles that of direct MPC, validating the learning process of GP-MPC.
+
+The similarity between the GP-MPC and direct MPC results underscores the effectiveness of Gaussian Process-based modeling in capturing the underlying dynamics of the DC motor system. By leveraging machine learning techniques, GP-MPC can accurately predict system behavior and generate control actions, offering a viable alternative to traditional control methods.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/data_points_dc_noise}
+    \caption{Data points from a noisy and uncertain DC motor plant}
+    \label{fig:data_points_with_noise}
+\end{figure}
+
+\subsubsection{Modelling With Uncertainty}
+Modeling dynamic systems with noise and uncertainty is crucial for capturing real-world complexities and enhancing predictive accuracy. Noise represents random disturbances in the system or measurements, while uncertainty includes unknown or variable factors affecting system dynamics. Incorporating these elements into models provides a more realistic representation of system behavior and supports better-informed decision-making. Therefore, we will focus on a plant with noisy measurements. Additionally, we will consider parameter uncertainty, as shown in Equation \ref{eq:dc_uncert_xk+1}. Modeling with and without uncertainty should be the same for the GP-MPC framework because the Gaussian Process (GP) always learns the model directly. This continuous, direct learning process allows the GP to adapt to and incorporate new data in real time, irrespective of whether uncertainty is explicitly modeled.
+
+
+
+
+Figure \ref{fig:data_points_with_noise} illustrates data points collected from a dynamic system affected by noise and parameter uncertainty. The presence of noise and uncertainty introduces variability and unpredictability into the system's behavior, leading to deviations from idealized models. Consequently, accurate modeling of such systems requires accounting for stochastic processes and uncertain parameters.
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/mpc_dc_noise_1}
+    \caption{GP-MPC controller- DC motor plant with uncertainty and noisy meaurements}
+    \label{fig:Gp-mpc_noise_dc}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/DC_motor/f_mpc_noise_1}
+    \caption{f-MPC controller- DC motor plant with uncertainty and noisy measurements}
+    \label{fig:f-mpc_dc_noise}
+\end{figure}
+
+\begin{equation} \label{eq:modified_ocp_dc_noise}
+    \begin{aligned}
+ & \underset{u^*_k}{\text{minimize}} \ J(k) = \sum_{k=i}^{i+N-1}( x_{k+1}^T Q x_{k+1} + u_k^T R u_k )  \\
+ \text{subject to}\\
+& x_{k+1} =  A_d x_k + B_d u_k + \epsilon  \quad \text{for } k=i \\
+    % & A_d = A - 0.1 *randn* A \\
+    % & B_d = B - 0.1 *randn* B \qquad // randn-matlab\quad function\\ 
+& x_0 = X_{k+1}(end) \qquad  \text{//end point of dataset} \\
+& -10 \leq u_k \leq 10 \quad \text{for } k=i,\ldots,i+N-1 \\
+& u_0 = U_k(end) \\
+\end{aligned}
+\end{equation}
+
+In Section \ref{sec:controllerdesign}, the optimal control problem for the DC motor is described by Equation (\ref{eq:modified_ocp_dc_noise}). This problem aims to regulate both the angle and angular velocity states of the motor. It is formulated over a prediction horizon spanning 15 steps. The initial states and control input are specified as the endpoint of the dataset, while the control input is bounded within the range of $-10 \leq u_k \leq 10$. To achieve a responsive and efficient controller, the weighting matrices $Q$ and $R$ are carefully adjusted, emphasizing quick control response with minimal input.
+
+
+Figure \ref{fig:Gp-mpc_noise_dc} illustrates the learning process of the GP-MPC controller applied to the uncertainty model of the DC motor. Despite considering maximum uncertainty and noisy measurements, the performance of the MPC controller remains robust. Remarkably, it is comparable to the performance of the MPC controller without noise, as shown in Figure \ref{fig:GPMPC_DC_wo_noise}. Even though there is model uncertainty, the GP-MPC model adapts to the uncertainty quickly fast and controls over a few timesteps. The settling time of angular velocity is $t_s=9$ and the settling time of angle is $t_s=11$. Both states are faster reaching the set point within 11 timesteps. One key factor contributing to the better performance of the uncertainty model is the immediate inclusion of every observed state transition in the GP dynamics model.
+
+
+
+
+
+The same Model Predictive Control (MPC) framework is applied to the dynamics of the DC motor is described by Equation (\ref{eq:dc_uncert_xk+1}), with an optimal control problem formulation and constraints identical to those represented in Equation (\ref{eq:modified_ocp_dc_noise}). The outcomes of this application are presented in Figure \ref{fig:f-mpc_dc_noise}. The settling time of angular velocity is $t_s=8$ and the settling time of angle is $t_s=9$. Both states are faster reaching the set point within 9 timesteps. Comparing the plots in Figure \ref{fig:GPMPC_DC_wo_noise} and Figure \ref{fig:f-mpc_dc_noise}, it becomes evident that the behavior of the GP-MPC closely mirrors that of direct MPC. This alignment validates the effectiveness of the learning process within the GP-MPC framework.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/phase_portrait_vector_pts}
+    \caption{Phase portrait of the unforced Van der Pol oscillator}
+    \label{fig:pp_vdp}
+\end{figure}
+
+
+\subsection{Van der Pol Oscillator}\label{sec:vdp_oscillator}
+The Van der Pol oscillator is a non-linear second-order differential equation that describes self-sustained oscillations. It was introduced by Dutch physicist Balthasar van der Pol in 1920 while studying electronic circuits. The equation is commonly used to model various systems exhibiting oscillatory behavior, such as electrical circuits, biological systems, and mechanical systems \cite{guckenheimer1980}.
+
+
+
+The Van der Pol oscillator equation is typically written as:
+\begin{equation} \label{eq:vdp_deq}
+    \frac{{d^2x}}{{dt^2}} - \mu (1 - x^2) \frac{{dx}}{{dt}} + x = 0
+\end{equation}  
+
+Here, \( x \) is the displacement of the oscillator from its equilibrium position, \( t \) is time, and \( \mu \) (mu) is a parameter that represents the non-linearity and damping strength of the oscillator. When \( \mu \) is small, the system behaves like a linear oscillator, but as \( \mu \) increases, the non-linear effects become more prominent, leading to interesting dynamics such as limit cycles and chaos.
+
+
+
+The Van der Pol oscillator exhibits a limit cycle, which means its solutions repeat periodically in phase space. This makes it useful for modeling systems with periodic behavior, such as electronic circuits, where it can represent relaxation oscillators and other types of oscillatory behavior.
+
+
+The classical Van der Pol oscillator with control input can be described by the following dynamic equations \cite{korda2020optimal}:
+
+\begin{equation}\label{eq:vdp_states_equation}
+    \begin{aligned}
+        \dot{x}_1 &= 2x_2 \\
+        \dot{x}_2 &= -0.8x_1 + 2x_2 - 10x_1^2x_2 + u
+\end{aligned}
+\end{equation}
+
+
+where \( x_1 \) and \( x_2 \) represent the state variables of the system, and \( u \) is the control input. The parameter \( \mu \) in the original Van der Pol equation is represented in the damping term \( -10x_2(1 - x_2^2) \), indicating the nonlinearity and damping strength. In this system, the sign of the damping term \( -10x_2(1 - x_2^2) \) changes based on whether \( |x_2| \) is greater or less than unity. This term introduces nonlinearity into the system dynamics\cite{girotti_vanderpol_lecturenotes}. The uncontrolled system, where \( u = 0 \), has an unstable fixed point at the origin and a stable limit cycle around the origin. This behavior is depicted in Figure \ref{fig:pp_vdp}. Nonlinear systems cannot be discretized conventionally such as linear systems. Therefore, the fourth-order Runge-Kutta (RK4) method with a fixed sampling time $T_s = 0.2$ s is utilized for discretization. 
+
+\begin{figure}
+    \centering
+    \includesvg[width=0.9\columnwidth]{figures/vdp/Data_set_test_vdp}
+    \caption{Data points,xk+1 and uk for model learning validation for the Van der Pol oscillator}
+    \label{fig:data_test_vdp}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/gp_valdation_w_uncert}
+    \caption{Gaussian Process model testing for the Van der Pol oscillator}
+    \label{fig:gp_test_vdp}
+\end{figure}
+
+
+
+
+\subsubsection{Validation of Van der Pol Oscillator Learning}
+As explained, the validation of Gaussian Process (GP) and long-term prediction models is crucial for the design of the Model Predictive Controller. The effectiveness of the long-term prediction model hinges on the dependability of the Gaussian Process (GP) model. GP models are instrumental in regression tasks, especially in scenarios involving sparse data, resilient models, or noisy datasets that direct to uncertainty models. Therefore, we will focus on a plant with an uncertainty model of the Van der Pol oscillator.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/long_w_uncert}
+    \caption{Long-term prediction model testing for the Van der Pol oscillator}
+    \label{fig:long_term__vdp}
+\end{figure}
+
+
+
+Hence, uncertainty is introduced to the state equation of the Van der Pol oscillator Equation \ref{eq:vdp_states_equation} and the modified state equation is,
+
+\begin{equation}\label{eq:vdp_states_equation_uncert}
+    \begin{aligned}
+        \dot{x}_1 &= (2+2\lambda)x_2 \\
+        \dot{x}_2 &= -(0.8+0.8 \alpha)x_1 + (2+2 \lambda)x_2 - (10+10\gamma)x_1^2x_2 + u
+\end{aligned}
+\end{equation}
+
+where $\lambda, \alpha \quad \text{and} \quad \gamma$, are random distribution
+in the interval (0,1) that won't change Van der Pol oscillator system properties. The dataset was created by applying a random selection of input \( u_k \) to the Van der Pol Oscillator plant state equation described in Equation (\ref{eq:vdp_states_equation_uncert}). The augmented data \( X_k \) and \( U_k \) are utilized as input for training the Gaussian Process (GP) model, while \( X_{k+1} \) serves as the output. The resulting dataset is visualized in Figure \ref{fig:data_test_vdp}. With a size of 30, the dataset is relatively small for model training, but it is adequate for validation purposes.
+
+
+
+
+The trained Gaussian Process (GP) model undergoes testing with 60 random inputs \( \hat{u_k} \). At every step, the resulting mean is used to predict the next state, and variance is neglected. The resulting predicted mean alongside the control input in Figure \ref{fig:gp_test_vdp}. A comparison is made between the predicted mean and the actual values derived from the Van der Pol Oscillator model described in Equation \ref{eq:vdp_states_equation}. The RMSE for \( x_1 \) is found to be 25\%, and for \( x_2 \) it is 29\%. These RMSE values are high compared to the linear model, this is because a number of interactions (training dataset size) is not enough to make accurate predictions for nonlinearity and noisy measurements of the state equation. Because of this, the variance is higher at some point, where the predictions are slightly deviated from actual values.  This can be reduced by adding a few more data points to the learning. In summary, the validation process confirms the reliability and accuracy of the GP model, demonstrating its capability to provide trustworthy predictions.
+
+\begin{figure}
+    \centering
+    \includesvg[width=0.9\columnwidth]{figures/vdp/data_set_vdp_det}
+    \caption{Data points of a Van der pol oscillator deterministic plant}
+    \label{fig:data_points_with_noise_vdp}
+\end{figure}
+
+The long-term prediction model undergoes testing with the same set of 60 random inputs \( \hat{u_k} \). At each time step, we will use both mean and variance for the next prediction. The resulting predicted mean and control inputs are visualized in Figure \ref{fig:long_term__vdp}. These predictions are then compared with the actual values derived from the uncertainty model described in Equation \ref{eq:vdp_states_equation_uncert}. The root mean square error (RMSE) for \( x_1 \) and \( x_2 \) are found to be 55\% and 42\% respectively.
+
+The comparison between the Gaussian Process (GP) model and the long-term prediction model highlights notable differences in their performance. While the GP model demonstrates high accuracy with small root mean square errors (RMSE) of 25\% for \( x_1 \) and 29\% for \( x_2 \), the long-term prediction model yields higher RMSE values of 55\% for \( x_1 \) and 42\% for \( x_2 \). Despite the higher predictive accuracy often demonstrated by GP models, the neglect of previously predicted variance can be a drawback, particularly in scenarios where understanding the reliability and confidence levels of predictions is crucial. Therefore, depending on the specific application and the importance of capturing input uncertainty, long-term prediction models might be preferred over GP models despite their potentially lower predictive accuracy.
+
+
+
+Furthermore, ensuring the validation of the long-term prediction model is vital for its integration into Model Predictive Control (MPC) systems. There are major disparities from actual measurements at the end of the prediction horizon, it is due to high variances in the GP model that occurred due to the small number of data points. However, it's important to recognize that as the prediction horizon extends, the impact of small-size data may result in additional disparities between predicted and actual values. With the smaller prediction horizon of up to 20 timesteps, the prediction is accurate with small prediction errors and the Gaussian distributed predictions demonstrate satisfactory accuracy for modeling the MPC controller.
+
+
+
+\subsubsection{Modelling Without Uncertainty}
+The Van der Pol oscillator is a classic example of a deterministic nonlinear oscillator, often used to describe various phenomena in physics and engineering. By eliminating stochastic influences, deterministic models provide a precise framework for understanding how the system responds to inputs and evolves over time. This clarity is particularly advantageous in situations where noise is either minimal or can be effectively managed through other means. The deterministic Van der Pol oscillator is discussed in detail in Section \ref{sec:vdp_oscillator}.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/GP_mpc_vdp_det}
+    \caption{GP-MPC controller- Van der Pol oscillator deterministic plant}
+    \label{fig:Gp-mpc_noise_vdp}
+\end{figure}
+
+The dataset was generated using the standard plant model without any additional noise, as described in Equation (\ref{eq:vdp_states_equation}), with a randomly selected set of input values $u_k$. Such a deterministic model accurately captures the system's behavior under ideal conditions, facilitating analysis and simulation. The resulting dataset, comprising 30 data points, is visually represented in Figure \ref{fig:data_points_with_noise_vdp}. 
+
+As discussed in Section \ref{sec:controllerdesign}, in the optimal control problem our objective is to control the states displacement and velocity, aiming to take the states to zero as fast as possible with minimal control input. The optimal control problem is defined over a prediction horizon of 15 steps. The initial states and control input are given as the end point of the dataset, and the control input constraint is defined as $-10 \leq u_k \leq 10$. The weighting matrices $Q$ and $R$ are adjusted to ensure that the controller operates quickly with minimal input.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/f_mpc_vdp_det}
+    \caption{f-MPC controller- Van der Pol oscillator deterministic plant}
+    \label{fig:f-mpc_noise_vdp}
+\end{figure}
+
+The implementation of Gaussian Process Model Predictive Control (GP-MPC) to the noise-free Van der Pol oscillator, as illustrated in Figure \ref{fig:Gp-mpc_noise_vdp}. The settling time of displacement is $t_s=13$ and the settling time of velocity is $t_s=12$. Both states are faster reaching the set point within 13 timesteps. Through iterative optimization, the GP-MPC controller leverages the noise-free system dynamics to achieve control performance, even in the absence of stochastic disturbances.
+
+
+The same MPC framework is applied to the dynamics of the Van der pol oscillator described by Equation (\ref{eq:vdp_states_equation}), with identical optimal control problem formulations and constraints. These results are depicted in Figure \ref{fig:f-mpc_noise_vdp}. The settling time of displacement is $t_s=9$ and the settling time of velocity is $t_s=10$. Both states are faster reaching the set point within 10 timesteps, which is faster compared to the GP-MPC controller this is due to modeling errors that occurred during GP training and long-term prediction model learning. 
+
+Direct MPC results are compared against GP-MPC results to ensure the accuracy of the learning process of GP-MPC framework. The comparison between the plots in Figure \ref{fig:Gp-mpc_noise_vdp} and Figure \ref{fig:f-mpc_noise_vdp} reveals that the behavior of the GP-MPC struggles to control in the beginning stage of the control horizon which takes more control effort to control the states, this is due to prediction errors in the long-term prediction model. 
+
+
+
+% closely resembles that of direct MPC, validating the learning process of GP-MPC.
+
+% The similarity between the GP-MPC and direct MPC results underscores the effectiveness of Gaussian Process-based modeling in capturing the underlying dynamics of the DC motor system. By leveraging machine learning techniques, GP-MPC can accurately predict system behavior and generate control actions, offering a viable alternative to traditional control methods.
+
+
+
+
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/2_data_points_uncert_vdp}
+    \caption{Data points of an uncertainty Van der pol oscillator plant}
+    \label{fig:data_points_with_unc_vdp}
+\end{figure}
+
+\subsubsection{Modelling With Uncertainty}
+In this section, we explore the application of the Gaussian Process Model Predictive Control (GP-MPC) to the Van der Pol oscillator in the presence of uncertainty. In the context of the Van der Pol oscillator, uncertainties can manifest as variations in system parameters or disturbances affecting the dynamics. To capture these uncertainties, we augment the system equations with stochastic terms, as shown in Equation (\ref{eq:vdp_states_equation_uncert}). 
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/2_Gp_mpc_uncert_vdp}
+    \caption{GP-MPC controller- Van der Pol oscillator plant with parameter uncertainty }
+    \label{fig:Gp-mpc_unc_vdp}
+\end{figure}
+
+
+
+To train the GP model under uncertainty, we generate a dataset by applying a random selection of control inputs ($u_k$) to the uncertain Van der Pol oscillator described by the modified state equation (\ref{eq:vdp_states_equation_uncert}). The resulting state transitions ($x_{k+1}$), current states ($x_k$), and control inputs ($u_k$) constitute the training data for the GP model. Figure \ref{fig:data_points_with_unc_vdp} illustrates the data points used for model learning validation.
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/2_f_mpc_uncert_vdp}
+    \caption{f-MPC controller- Van der Pol oscillator plant with parameter uncertainty}
+    \label{fig:f-mpc_unc_vdp}
+\end{figure}
+
+Here, the optimal control problem is similar to the OCP of modeling without uncertainty, but here we take the uncertainty-trained model, aiming to take the states to zero as fast as possible with a minimal control input. Figure \ref{fig:Gp-mpc_unc_vdp} illustrates the learning process of the GP-MPC controller applied to the uncertainty model of the Van der Pol Oscillator. The settling time of displacement is $t_s=13$ and the settling time of velocity is $t_s=14$. Both states are faster reaching the set point within 14 timesteps. 
+
+Through iterative optimization, the GP-MPC controller leverages the uncertainty system dynamics to achieve control performance, even in the presence of stochastic disturbances. One big reason why the uncertainty model works better is because we quickly include every change in the system's state into our model. This helps the model adapt and learn from uncertainty as things change, making the controller better at handling mistakes in the model.
+
+We use the same MPC directly on the Van der pol oscillator dynamics described by Equation (\ref{eq:vdp_states_equation_uncert}). The results are shown in Figure \ref{fig:f-mpc_unc_vdp}. The time it takes for the displacement and velocity to settle is 9 timesteps $t_s=9$. Both states reach their target faster, within 9 timesteps, better compared to the GP-MPC controller.
+
+We compare the results of Direct MPC with GP-MPC to make sure GP-MPC is learning correctly. When we look at the plots in Figure \ref{fig:Gp-mpc_unc_vdp} and Figure \ref{fig:f-mpc_unc_vdp}, we notice that GP-MPC struggles to control the system at the beginning of the control horizon. This increased control effort to regulate the states is primarily due to prediction errors in the long-term prediction model.
+
+% This means more effort is needed to control the states, mainly because there were prediction errors in the long-term prediction model, which is due to the uncertainty of the plant.
+
+\\
+\qquad
+\\
+
+
+% \vskip12pt
+\subsubsection{Reference Tracking of Van der Pol Oscillator}
+% \textlarger[6]{Reference tracking}
+
+Reference tracking in control systems refers to the ability of the system to accurately reach the target setpoint over time. By adjusting the control inputs, the system's behavior is regulated to closely match the specified reference target point, enabling it to achieve desired performance objectives. In the context of the Van der pol oscillator uncertainty dynamics discussed earlier, implementing reference tracking involves setting new target values for displacement and velocity, and then utilizing Model Predictive Control (MPC) to ensure that the states closely follow these targets. The Reference tracking capability is crucial for applications where precise control and adherence to specified trajectories are essential, such as robotics, autonomous vehicles, and industrial automation.
+
+In the preceding section, we observed the stabilization of the system from a point outside the stable limit cycle to the unstable equilibrium at the origin, using an initial point $x_0 = [1.0, 1.0]$ and a reference point $x_f = [0, 0]$. 
+\\
+\quad
+In this section, we examine two kinds of reference tracking :
+
+\begin{itemize}
+    \item The transition from a point outside the stable limit cycle to a stabilizable point inside the stable limit cycle, where the initial point remains $x_0 = [1.0, 1.0]$ but the reference point is adjusted to $x_f = [-0.25, 0]$.
+    \item The transition from a point outside the stable limit cycle to a stabilizable point near the stable limit cycle, where the reference point is adjusted to $x_f = [1, 0]$.
+\end{itemize}
+
+
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/2_setpoint_gp_mpc}
+    \caption{GP-MPC controller- Van der Pol oscillator plant with parameter uncertainty, set point $x_f= [-0.25,0]$}
+    \label{fig:Gp-mpc_unc_vdp_setpoint}
+\end{figure}
+
+The cost function is modified as suitable to reference tracking as follows,
+\begin{equation}
+    J(k) = \sum_{k=i}^{i+N-1}( (x_{k+1}-x_f)^T Q (x_{k+1}-x_f) + u_k^T R u_k ) 
+\end{equation}
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/2_fmpc_setpont}
+    \caption{f-MPC controller- Van der Pol oscillator plant with parameter uncertainty, set point $x_f= [-0.25,0]$}
+    \label{fig:f-mpc_unc_vdp_setpoint}
+\end{figure}
+\\
+\\
+\textbf{-Setpoint $x_f= [-0.25,0]$}
+
+The GP-MPC framework is applied to the Van der Pol oscillator for a new setpoint $x_f= [-0.25,0]$, utilizing a modified cost function. The results are shown in Figure \ref{fig:Gp-mpc_unc_vdp_setpoint}. The settling time for displacement is $t_s=12$, and for velocity, it's $t_s=13$. Both states reach the setpoint faster within 13 timesteps. However, GP-MPC encounters challenges in controlling the system during the initial stages of the control horizon, requiring more control effort to regulate the states.
+
+Similarly, we employ the Model Predictive Control (MPC) framework with a modified cost function on the dynamics described by Equation (\ref{eq:vdp_states_equation_uncert}), maintaining identical optimal control problem formulations and constraints. These results are depicted in Figure \ref{fig:f-mpc_unc_vdp_setpoint}. Direct comparison between f-MPC and GP-MPC results ensures the accuracy of the learning process within the GP-MPC framework.
+\\
+\\
+\textbf{-Setpoint $x_f= [1,0]$}
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/5_gp_mpc_set_1_0}
+    \caption{GP-MPC controller- Van der Pol oscillator plant with parameter uncertainty, set point $x_f= [1,0]$}
+    \label{fig:Gp-mpc_unc_vdp_setpoint_1}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includesvg[width=1\columnwidth]{figures/vdp/5_f_mpc_set_1_0}
+    \caption{f-MPC controller- Van der Pol oscillator plant with parameter uncertainty, set point $x_f= [1,0]$}
+    \label{fig:f-mpc_unc_vdp_setpoint_1}
+\end{figure}
+
+Similarly to a new setpoint $x_f= [1,0]$, the GP-MPC framework is applied utilizing a modified cost function over 20 timesteps prediction horizon. The results are shown in Figure \ref{fig:Gp-mpc_unc_vdp_setpoint_1}. The settling time for displacement is $t_s=7$, and for velocity, it's $t_s=14$. Both states reach the setpoint faster within 14 timesteps. However, GP-MPC encounters challenges in controlling the velocity during the initial stages of the control horizon, requiring more control effort to regulate the states. We employ the Model Predictive Control (MPC) framework to a new setpoint $x_f= [1,0]$ on the dynamics described by Equation (\ref{eq:vdp_states_equation_uncert}), maintaining identical optimal control problem formulations and constraints. The settling time for displacement is $t_s=12$, and for velocity, it's $t_s=12$. These results are depicted in Figure \ref{fig:f-mpc_unc_vdp_setpoint_1}. Direct comparison between f-MPC and GP-MPC results ensures the accuracy of the learning process within the GP-MPC framework. The main difference between the GP-MPC and direct MPC is that GP-MPC requires more control effort compared to direct MPC and hence it requires more time to reach the reference point. 
+
+
+
+% \begin{figure}
+%     \centering
+%     \def\svgwidth{\columnwidth}
+%     \includesvg{figures/fig_1}
+%     \caption{Gaussian Process model testing }
+%     \label{fig:data_points}
+% \end{figure}
+
+% \subsection{Hardware}
+
+% Room N1059 is a computer pool for students to work in. You can use MATLAB/SIMULINK 
+% there to do your calculations and write your thesis.
+
+
+% \subsection{Software}
+
+% There are different editors for \LaTeX. Some frequently used at the institute are TeXnicCenter and Texmaker. 
+% If you use TeXnicCenter you can import the file \linebreak \verb"Ausgabeprofile\_TeXnicCenter.tcp", in that folder, by 
+% \textit{Ausgabe - Ausgabeprofile definieren... - Importieren}. Choose the output-profile \verb!\LaTeX => PS => PDF student-thesis!. 
+% Thus the settings should be correct and a PDF of your work should be generated. If that does not work, check the settings for proper
+% paths to the post-processing and viewer programs.
+
+% Visio as graphical software is provided. If you produce figures directly with MATLAB, consider the export-setting of the ''print'' command.
+
+% \subsection{References}
+
+% The institute uses a common literature database, where a lot of books and articles that you may want to cite are already included. 
+% The respective \texttt{bib}-file can be found on \verb"S:\ICS library\ics.bib".
+% Copy the most recent version to your root directory of your thesis!
+
+% Then, you can open this file with your \LaTeX\ editor or you can use a literature manager like ''jabref'', for instance.
+% Check if the reference that you want to cite is included. In this case, you can simply use the BiB\TeX-key in the respective command.
+% The literature information is properly generated only, if \texttt{bibtex} is be executed twice: first \verb!bibtex pd! and then \verb!bibtex main!. 
+% If you use TeXnicCenter and the provided output-setting, this is done automatically. In other cases, the easiest way would be to use
+% the \texttt{build.cmd} file that accompanies this template. It will execute the compilation process in the proper order and open the pdf file
+% afterwards.
+
+% Please provide with your thesis complete information on your references (title, authors, date, DOI, maybe even pdf files). We would like to
+% include these in our database, if this has not already happened..
+
+
+% \subsection{Binding the work}
+
+% The institute offers you to print and bind the work. You need three copies in general, one for your supervisor, one for the Professor and one for yourself, and maybe more. 
+% After finalizing your work, it is also included in the literature database by your supervisor.
+
+% Your work is printed in the correct order. Put a transparent film in the front and a cardboard in the back.
+
+% Your work is stapled. Look for staples of the right length in the shelf in the computer pool and use the
+% large stapler. Afterwards tape the back of your work. You will find illustrative material in the bibliography.
+
+% In addition to your printed work, you have to hand in a cd with the pdf file of your work and other important files. 
+% Please structure them well, such that some years later somebody else is able to find the important things. The CD 
+% is fixed inside your work at the back within a paper cover.
+
+% Last but not least, do not forget to sign the declaration.

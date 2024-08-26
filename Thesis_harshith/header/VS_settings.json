@@ -1,0 +1,88 @@
+{
+    "latex-workshop.latex.tools": [
+        {
+            "name": "lualatex",
+            "command": "lualatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "--enable-write18",
+                "%DOC%.tex"
+            ],
+            "env": {}
+        },
+        {
+            "name": "pdflatex",
+            "command": "pdflatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "--enable-write18",
+                "-shell-escape",
+                "%DOC%.tex"
+            ],
+            "env": {}
+        },
+        {
+            "name": "biber",
+            "command": "biber",
+            "args": [
+                "%DOCFILE%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": [
+                "%DOCFILE%"
+            ],
+            "env": {}
+        }
+    ],
+    "latex-workshop.view.pdf.viewer": "tab",
+    "editor.wordWrap": "on",
+    "latex-workshop.latex.recipes":[
+        {
+            "name": "lualatex 🔃",
+            "tools": [
+                "lualatex"
+            ]
+        },
+        {
+            "name": "pdflatex",
+            "tools": [
+                "pdflatex"
+            ]
+        },
+        {
+            "name": "pdflatex ➞ biber ➞ pdflatex × 2",
+            "tools": [
+                "pdflatex",
+                "biber",
+                "pdflatex",
+                "pdflatex"
+            ]
+        },
+        {
+            "name": "pdflatex ➞ bibtex ➞ pdflatex × 2",
+            "tools": [
+                "pdflatex",
+                "bibtex",
+                "pdflatex",
+                "pdflatex"
+            ]
+        },
+        {
+            "name": "lualatex ➞ biber ➞ lualatex × 2",
+            "tools": [
+                "lualatex",
+                "biber",
+                "lualatex",
+                "lualatex"
+            ]
+        }
+    ]
+}

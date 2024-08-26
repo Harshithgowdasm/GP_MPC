@@ -1,0 +1,69 @@
+\section{Introduction}
+\label{sec:motivation}
+\begin{frame}
+    \frametitle{Motivation}
+    \begin{itemize}
+        \item Learning Non-linear systems
+        \item System identification requires Persistent Excitation condition %the input signal must be sufficiently rich to excite all dynamic modes of the system
+        \item Drawbacks of data-driven approaches
+	   \begin{itemize}
+            \item learning process is slow 
+		\item requires an large number of interactions
+            \item Data inefficiency makes control learning of robotic systems and other complex systems impractical  %Data inefficiency makes learning in control and robotic systems impractical and obstructs the use of data-driven methods in more complex situations.
+	   \end{itemize}
+        % \item Requires different data-driven approaches for different type of system 
+        % \item Model-based methods are susceptible to model errors
+        \item State and input constraints 
+
+    \end{itemize}
+\end{frame}	
+
+\begin{frame}     \frametitle{Approach}
+\begin{itemize}
+    \item Model Predictive Control(MPC)     % \item Task-specific prior knowledge 
+    % \item The extraction of more information
+    \item Model-Based Learning
+    \item Gaussian process
+    \item A transition model is proposed for long-term prediction  
+
+\end{itemize}
+\centering
+\begin{tikzpicture}[node distance=2cm, auto, thick, >=triangle 45]
+
+    % Define block styles
+    \tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+        text width=5em, text centered, rounded corners, minimum height=2em]
+    \tikzstyle{line} = [draw, -latex']
+    \tikzstyle{cloud} = [draw, ellipse,fill=red!20, minimum height=2em]
+
+    % Define nodes
+    \node [cloud] (plant) {Plant};
+    % \node [block, right of=plant, node distance=4cm] (data) {Data};
+    \node [block, above of=plant, node distance=2cm] (gpmodel) {GP Model};
+    \node [block, right of=gpmodel, node distance=6cm] (transition) {Transition Model};
+    % \node [block, below of=posterior, node distance=3cm] (transition) {Transition Model};
+    \node [block, below of=transition, node distance=2cm] (mpc) {MPC};
+
+    % Draw edges
+    \path [line] (plant) -- node {Data} (gpmodel);
+    % \path [line] (data) -- (gpmodel);
+    \path [line] (gpmodel) -- node {Posterior Prediction} (transition);
+    % \path [line] (posterior) -- (transition);
+    \path [line] (transition) -- node {Predictions}(mpc);
+    \path [line] (mpc) -- node {optimal $u^*(1)$}  (plant);
+    
+\end{tikzpicture}
+\end{frame}
+
+% \begin{frame}     \frametitle{Approach}
+
+
+% % % 
+% %  \begin{figure}[ht]		% h - here, t - top, b - bottom, p - page, ! - try hard
+% %   \centering
+% %   \afig{0.7}{figures/introduction/blockdia}			% {scaling}{Figure from MATLAB, picture, etc.}
+% %   \caption{Block Diagram of GP-MPC Controller Framework}
+% %   \label{f:figure1}
+% % \end{figure}
+
+% \end{frame}

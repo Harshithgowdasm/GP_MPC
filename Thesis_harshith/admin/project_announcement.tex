@@ -1,0 +1,39 @@
+ % This is a file to produce the announcement for the colloquium. The only things to do therefore are:
+% - define the desired language in line 8
+% - include the file thesis_data_lastname_firstname.tex in line 16 (including the data of your student, as done exemplarily in thesis_data_eichler_annika.tex)
+% - include the file abstract of the work
+
+%%################ Language settings ###################
+ % Language settings:
+\def\isenglish{false} 
+ % change to false for german language
+
+%############## File location settings #################
+\def\curdir{../}
+ % do not change
+ 
+
+ %%################ Document settings ###################
+\input{../header/header_pa}
+\addbibresource{../ics.bib}
+
+ %%################ Presentation settings ###################
+\def\whereFrom{TUHH}
+% where does the speaker comes from (if TUHH in capitol letters)
+\def\presentationDate{16.05.2014}
+% date of the presentation
+\def\presentationTime{11:45}
+% time of the presenation
+\def\presentationRoom{M2589}
+% time of the presenation
+
+
+ %%################## Thesis Data ######################
+% include the file thesis_data_lastname_firstname.tex here (where the data concering the thesis work is stored)
+\input{../admin/thesis_data}
+
+
+ %%##############################  CONTENTS ###############################
+\begin{document}
+\input{../header/include_pa}
+\end{document}
