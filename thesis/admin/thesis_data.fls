@@ -1,7 +1,0 @@
-PWD /home/jannis/Repos/Student_Supervision/PA_Harshith_Gowda/thesis/admin
-INPUT /etc/texmf/web2c/texmf.cnf
-INPUT /usr/share/texmf/web2c/texmf.cnf
-INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
-INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT thesis_data.tex
-OUTPUT thesis_data.log
