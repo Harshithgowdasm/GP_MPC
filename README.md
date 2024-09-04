@@ -12,6 +12,7 @@
  does not generally hold for a real system. Alternatively, a stochastic model can be used
  to model the state transition function. However, there is a lack of theoretical
  guarantees of probabilistic models, e.g., Gaussian processes.
+
  The goal of this thesis is to implement a probabilistic MPC scheme relying on Gaussian
  process models to represent the transition function of a discrete-time system with noisy
  measurements and uncertainty models. The thesis proves that one probabilistic GP-MPC
@@ -31,6 +32,7 @@
  without the need for additional interactions with the actual system. However, accurately
  modeling the underlying transition dynamics presents a significant challenge and inevitably
  introduces model errors.
+
  To address these model errors, probabilistic models have been proposed specifically the
  Probabilistic Gaussian process. These models explicitly incorporate uncertainties about
  the system dynamics. By considering model uncertainty, Model-based learning algorithms
@@ -40,6 +42,7 @@
  modeling process. Thus, leveraging probabilistic models can lead to more efficient learning
  and improved performance in learning tasks by better accommodating the inevitable
  inconsistencies between the learned model and the real system.
+
  This probabilistic Gaussian process has a limitation in that it cannot accept Gaussian input
  and predict over the entire prediction horizon (detailed explanation in Section 2.3). To
  address this, a transition model is proposed for long-term prediction, which serves as input
@@ -53,5 +56,22 @@
  transforms an open-loop controller into an implicit closed-loop (feedback) controller by
  continuously re-planning N steps ahead from the current state, as illustrated in Figure: 
     <p align="middle">
-        <img src="https://github.com/SimonRennotte/Data-Efficient-Reinforcement-Learning-with-Probabilistic-Model-Predictive-Control/blob/master/images/Cost_runs_Pendulum-v0.png?" width="80%" />
+        <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/papers/blockdia.png" width="80%" />
     </p>
+
+
+### Examples
+The application of GP-MPC framework lies in its versatility, as it can be applied to a wide range of systems,
+ whether linear or nonlinear, with or without uncertainty, and with or without noisy
+ measurements. Model uncertainty refers to parameter variations and external disturbances
+ that affect the system’s behavior. These mathematical uncertainty models represent all
+ aspects of real-world systems, leading to uncertainty in predicting their behavior. To
+ demonstrate its effectiveness, we have chosen to implement the GP-MPC framework on
+ both a linear system, the DC motor, and a nonlinear system, the Van der Pol oscillator.
+
+  ### Linear system - DC Motor
+
+      <p align="middle">
+        <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/examples/Dc%20motor%20plant/Results/Gp_MPC_without_uncertanity/gp_mpc_wo_1.svg" width="80%" />
+    </p>
+  
