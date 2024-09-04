@@ -20,28 +20,28 @@ The application of GP-MPC framework lies in its versatility, as it can be applie
 
   ### Linear system - DC Motor
     
- ## GP-MPC without noise   
+ ### GP-MPC without noise   
 <p align="middle">
         <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/examples/Dc%20motor%20plant/Results/Gp_MPC_without_uncertanity/gp_mpc_wo_1.svg" width="80%" />
 </p>
 
- ## GP-MPC with noise
+ ### GP-MPC with noise
 <p align="middle">
         <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/examples/Dc%20motor%20plant/Results/GP_MPC_with_uncertainity/mpc_dc_noise_1.svg" width="80%" />
 </p>
 
 ### Non Linear system - Van der Pol Oscillator
- ## GP-MPC without noise   
+ ### GP-MPC without noise   
 <p align="middle">
         <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/examples/Van_der_pol_oscillator/results/GP_MPC_without_uncertanity/GP_mpc_better.svg" width="80%" />
 </p>
 
- ## GP-MPC with noise
+ ### GP-MPC with noise
 <p align="middle">
         <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/examples/Van_der_pol_oscillator/results/GP_MPC_with_uncertanity/2_Gp_mpc_uncert_vdp.svg" width="80%" />
 </p>
 
- ## Reference tracking 
+ ### Reference tracking 
 <p align="middle">
         <img src="https://github.com/Harshithgowdasm/PA_Harshith_Gowda/blob/main/examples/Van_der_pol_oscillator/results/GP_MPC_with_uncertanity/4_gp_mpc_set_1_0.svg " width="80%" />
 </p>
